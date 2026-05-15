@@ -17,6 +17,19 @@ from app.data.flyer_ingestor import FlyerIngestor
 st.set_page_config(page_title="Grocer Hub · WhollyFare", page_icon="🏪", layout="wide")
 state.init()
 
+
+# ── Shared helper functions (used throughout this page) ───────────────────────
+
+def _chain_name(g: dict) -> str:
+    """Return the display name for a grocer, tolerating both 'chain' and 'name' keys."""
+    return g.get("chain") or g.get("name", "?")
+
+
+def _source(g: dict) -> str:
+    """Return the data-source string, tolerating both 'source' and 'source_type' keys."""
+    return g.get("source") or g.get("source_type", "manual_pdf")
+
+
 with st.sidebar:
     style.sidebar_nav()
 
@@ -53,9 +66,35 @@ with st.expander("✨ No grocery data yet? Load a sample week of prices to see t
         try:
             from app.data.sample_data import load_all_demo_data
             demo = load_all_demo_data()
-            st.session_state["grocers"]    = demo["grocers"]
-            st.session_state["flyer_data"] = demo["flyer_data"]
-            st.session_state["plan"]       = demo["plan"]
+
+            # Normalize grocers to the {chain, source, location, …} format the Hub expects
+            raw_grocers = demo["grocers"]
+            norm_grocers = []
+            for g in raw_grocers:
+                src = g.get("source") or ("api" if g.get("source_type") == "api" else "manual_pdf")
+                norm_grocers.append({
+                    "chain":      g.get("chain") or g.get("name", "?"),
+                    "location":   g.get("location", ""),
+                    "source":     src,
+                    "rewards":    g.get("rewards", False),
+                    "delivery":   g.get("delivery", False),
+                    "is_primary": g.get("is_primary", False),
+                })
+
+            # Normalize flyer_data from {week, stores: {id: {store_name, items}}} to
+            # {store_display_name: list_of_item_dicts} for status badges to work
+            raw_flyer = demo["flyer_data"]
+            if "stores" in raw_flyer:
+                norm_flyer = {}
+                for _sid, _sdata in raw_flyer["stores"].items():
+                    _display = _sdata.get("store_name", _sid)
+                    norm_flyer[_display] = _sdata.get("items", [])
+            else:
+                norm_flyer = raw_flyer
+
+            st.session_state["grocers"]        = norm_grocers
+            st.session_state["flyer_data"]     = norm_flyer
+            st.session_state["plan"]           = demo["plan"]
             st.session_state["ledger_history"] = demo["ledger_history"]
             st.session_state["active_week"]    = demo["active_week"]
             st.success("Sample prices loaded for Kroger + Food Lion! Scroll down to review, then head to This Week's Plan.")
@@ -100,7 +139,7 @@ with col_pull:
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Stores loaded",     len(loaded))
 c2.metric("Awaiting data",     max(0, len(grocers) - len(loaded)))
-c3.metric("API connected",     sum(1 for g in grocers if g.get("source") == "api"))
+c3.metric("API connected",     sum(1 for g in grocers if _source(g) == "api"))
 c4.metric("Items loaded",      state.total_items_loaded())
 
 st.divider()
@@ -109,7 +148,10 @@ st.divider()
 with st.sidebar:
     st.markdown("### Configured stores")
     for i, g in enumerate(grocers):
-        st.caption(f"{'🔗' if g.get('source')=='api' else '📄'} {g['chain']}")
+        chain_display = g.get("chain") or g.get("name", "?")
+        src = g.get("source") or g.get("source_type", "")
+        icon = "🔗" if src in ("api",) else "📄"
+        st.caption(f"{icon} {chain_display}")
     st.divider()
 
     with st.expander("＋ Add a store"):
@@ -154,12 +196,14 @@ if not grocers:
 ingestor = FlyerIngestor()
 
 # Separate API-connected and manual stores
-api_stores     = [g for g in grocers if g.get("source") in ("api", "manual_pdf+api")]
-manual_stores  = [g for g in grocers if g.get("source") == "manual_pdf"]
+api_stores    = [g for g in grocers if _source(g) in ("api", "manual_pdf+api")]
+manual_stores = [g for g in grocers if _source(g) == "manual_pdf"]
+
 
 def _status_badge(chain: str) -> str:
     if chain in loaded:
-        count = len(st.session_state["flyer_data"].get(chain, []))
+        raw = st.session_state["flyer_data"].get(chain, [])
+        count = len(raw)
         return f'<span class="pill pill-ok">✓ {count} items</span>'
     return '<span class="pill pill-miss">⚠ No data</span>'
 
@@ -256,9 +300,8 @@ def _pull_kroger(chain: str, location_id: str) -> int:
 if api_stores:
     st.markdown("**API-connected stores**")
     for g in api_stores:
-        chain   = g["chain"]
+        chain   = _chain_name(g)
         is_ok   = chain in loaded
-        card_cls = "ok" if is_ok else "api"
 
         with st.container(border=True):
             col_icon, col_info, col_actions = st.columns([0.5, 3, 2])
@@ -288,7 +331,7 @@ if api_stores:
                 with bcol2:
                     if is_ok:
                         if st.button("View items", key=f"view_{chain}", use_container_width=True):
-                            st.session_state[f"_view_store"] = chain
+                            st.session_state["_view_store"] = chain
                             st.rerun()
 
     # Handle "pull all" button
@@ -306,7 +349,7 @@ if api_stores:
 if manual_stores:
     st.markdown("**Manual upload stores** (download PDF → upload here)")
     for g in manual_stores:
-        chain  = g["chain"]
+        chain  = _chain_name(g)
         is_ok  = chain in loaded
 
         # Flyer download link hint per chain
@@ -360,16 +403,27 @@ if view_store and view_store in st.session_state.get("flyer_data", {}):
     st.divider()
     st.markdown(f"**{view_store} — items loaded this week**")
     items = st.session_state["flyer_data"][view_store]
-    rows = [
-        {
-            "Name":     c.name,
-            "Category": c.category,
-            "Price":    f"${c.sale_price_per_unit:.2f}/{c.unit}",
-            "Allergens": ", ".join(c.allergens) or "—",
-            "Tags":     ", ".join(c.tags[:3]) + ("…" if len(c.tags) > 3 else ""),
-        }
-        for c in items
-    ]
+    rows = []
+    for c in items:
+        # Support both IngredientCandidate dataclass objects and plain dicts
+        if isinstance(c, dict):
+            price = c.get("sale_price") or c.get("sale_price_per_unit", 0)
+            unit  = c.get("unit", "")
+            rows.append({
+                "Name":      c.get("name", "?"),
+                "Category":  c.get("category", "—"),
+                "Sale price": f"${price:.2f}/{unit}" if price else "—",
+                "Regular":   f"${c['regular_price']:.2f}" if c.get("regular_price") else "—",
+                "Allergens": ", ".join(c.get("allergens", [])) or "—",
+            })
+        else:
+            rows.append({
+                "Name":      c.name,
+                "Category":  c.category,
+                "Sale price": f"${c.sale_price_per_unit:.2f}/{c.unit}",
+                "Regular":   "—",
+                "Allergens": ", ".join(c.allergens) or "—",
+            })
     st.dataframe(rows, use_container_width=True, height=300)
 
 st.divider()
@@ -414,18 +468,64 @@ if run_btn:
 
     with st.spinner("Assembling weekly meal plan…"):
         from app.core_logic.meal_planner import MealPlanner
-        planner  = MealPlanner(household)
-        plan     = planner.assemble_week(
+        planner   = MealPlanner(household)
+        raw_plan  = planner.assemble_week(
             hero_ingredients=selected,
             flyer_week=st.session_state["active_week"],
         )
-        st.session_state["plan"] = plan
+        n_meals = len(raw_plan.meals)
+
+        # Convert WeeklyPlan dataclass to the dict format expected by pages 3/4/5
+        plan_meals = []
+        plan_total = 0.0
+        for meal in raw_plan.meals:
+            ing_list = []
+            meal_cost = 0.0
+            for scored in meal.ingredients:
+                ing = scored.ingredient
+                cost = ing.sale_price_per_unit
+                ing_list.append({
+                    "item":  ing.name,
+                    "qty":   f"1 {ing.unit}",
+                    "store": getattr(ing, "source_store", "kroger_palmyra"),
+                    "cost":  round(cost, 2),
+                })
+                meal_cost += cost
+            is_gf = all("gluten-free" in getattr(i.ingredient, "tags", []) for i in meal.ingredients)
+            plan_meals.append({
+                "day":            meal.day,
+                "name":           meal.name,
+                "gluten_free":    is_gf,
+                "allergen_notes": "",
+                "best_store":     "kroger_palmyra",
+                "ingredients":    ing_list,
+                "meal_cost":      round(meal_cost, 2),
+            })
+            plan_total += meal_cost
+
+        total_servings = n_meals * household.servings_per_meal
+        single_est     = round(plan_total * 1.18, 2)
+        hf_equiv       = round(total_servings * 9.99, 2)
+
+        plan_dict = {
+            "week":     st.session_state["active_week"],
+            "servings": household.servings_per_meal,
+            "meals":    plan_meals,
+            "totals": {
+                "whollyfare_plan":   round(plan_total, 2),
+                "single_store_best": single_est,
+                "hellofresh_equiv":  hf_equiv,
+                "found_money":       round(single_est - plan_total, 2),
+                "vs_hellofresh":     round(hf_equiv - plan_total, 2),
+            },
+        }
+        st.session_state["plan"] = plan_dict
 
     n_passed   = len(result.passed)
     n_rejected = len(result.rejected)
     st.success(
-        f"✅ Plan generated — {len(plan.meals)} dinners · "
-        f"{n_passed} ingredients passed · {n_rejected} rejected for safety.",
+        f"✅ Plan generated — {n_meals} dinners · "
+        f"{n_passed} ingredients cleared · {n_rejected} rejected for safety.",
         icon="✅",
     )
     st.page_link("pages/3_Plan.py", label="→ Review the plan", icon="🍽️")

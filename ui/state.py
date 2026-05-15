@@ -60,9 +60,18 @@ def stores_loaded_this_week() -> list[str]:
 
 
 def total_items_loaded() -> int:
-    return sum(
-        len(v) for v in st.session_state.get("flyer_data", {}).values()
-    )
+    """Count of ingredient items across all loaded stores.
+
+    Handles two flyer_data shapes:
+      - {store_name: list[IngredientCandidate | dict]}  (normal engine path)
+      - {week: str, stores: dict}  (old wrapped demo format — should be normalised before this)
+    """
+    total = 0
+    for v in st.session_state.get("flyer_data", {}).values():
+        if isinstance(v, list):
+            total += len(v)
+        # Non-list values (e.g. a leftover week-string) are silently skipped
+    return total
 
 
 def plan_ready() -> bool:

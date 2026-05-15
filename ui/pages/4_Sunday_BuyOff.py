@@ -16,13 +16,19 @@ state.init()
 with st.sidebar:
     style.sidebar_nav()
 
-style.page_header("Sunday Buy-Off", "Review, approve, and go.")
+style.page_header(
+    "Sunday Buy-Off",
+    "This is the moment. See what you saved, confirm the plan, and walk into the week ready.",
+)
 
 # ── Setup check ───────────────────────────────────────────────────────────────
 plan = st.session_state.get("plan")
 
 if not plan:
-    st.warning("No plan ready yet. Generate a plan first.", icon="⚠️")
+    st.warning(
+        "No plan generated yet — head to Grocer Hub to load this week's prices and run the engine.",
+        icon="⚠️",
+    )
     st.page_link("pages/2_Grocer_Hub.py", label="→ Go to Grocer Hub", icon="🏪")
     st.stop()
 

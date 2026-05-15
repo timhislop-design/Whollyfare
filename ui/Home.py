@@ -260,61 +260,190 @@ if not state.is_setup_complete():
     </div>
     """, unsafe_allow_html=True)
 
+    # ── Tier data (shared between cards and sub-pages) ────────────────────────
     tiers = [
         {
             "id": 1, "color": "#3A8C4E", "price": "Free", "price_sub": "forever",
-            "name": "Price Finder", "badge": "",
+            "name": "Price Finder", "badge": "", "cta": "Get started",
             "tagline": "See where the savings are before you ever shop.",
-            "features": [
-                "Compare prices across all your local stores",
-                "Digital coupon matching, automated",
-                "Weekly savings report",
-                "No credit card needed",
+            "features": ["Cross-store price comparison", "Digital coupon matching", "Weekly savings report", "No credit card needed"],
+            "headline": "Start here. No commitment, no card.",
+            "description": "Connect your local stores and WhollyFare pulls this week's actual sale prices — then shows you exactly where the deals are and how much you're leaving on the table.",
+            "detail_sections": [
+                ("What you get", [
+                    ("Cross-store price comparison", "Kroger vs Food Lion vs any store you add — side by side, updated every week from live APIs and PDF circulars."),
+                    ("Automated coupon matching", "WhollyFare scans digital coupons at every connected store and matches them to items you're already buying."),
+                    ("Weekly savings report", "See exactly how much you'd save vs. single-store shopping — every week, before you commit to anything."),
+                    ("PDF upload for any store", "No API? Upload the weekly circular as a PDF and we parse it automatically."),
+                    ("Free forever", "Price Finder never charges. No trial period, no credit card."),
+                ]),
+                ("Perfect for", [
+                    ("New to WhollyFare", "Explore the platform and build confidence before committing to a meal plan."),
+                    ("Savvy comparison shoppers", "You already split your shopping — this tells you which store wins on what, every single week."),
+                    ("Households tracking spend", "The Found Money Ledger starts logging your savings from day one."),
+                ]),
             ],
-            "cta": "Get started",
+            "next_tier": {"id": 2, "name": "Meal Planner", "price": "$7/mo", "teaser": "Ready to have five dinners planned for you every Sunday?"},
         },
         {
             "id": 2, "color": "#5DAA6A", "price": "$7", "price_sub": "/ month",
-            "name": "Meal Planner", "badge": "Most popular",
+            "name": "Meal Planner", "badge": "Most popular", "cta": "Start planning",
             "tagline": "Five dinners planned around this week's best prices.",
-            "features": [
-                "Everything in Price Finder",
-                "Weekly 5-dinner meal plan",
-                "Flavor Plugins — same ingredients, different cuisines",
-                "Sunday Buy-Off approval screen",
-                "Shopping list by store & category",
+            "features": ["Everything in Price Finder", "Weekly 5-dinner meal plan", "Flavor Plugins", "Sunday Buy-Off screen", "Shopping list by store"],
+            "headline": "Five dinners. Every Sunday. Done.",
+            "description": "WhollyFare builds your week's dinners from this week's actual sale prices. You review the plan on Sunday, approve it in one tap, and get a shopping list organised by store.",
+            "detail_sections": [
+                ("What you get", [
+                    ("Weekly 5-dinner meal plan", "Each week's plan is built fresh from the best-priced safe ingredients at your stores. No pre-set menus, no repeated weeks."),
+                    ("Flavor Plugins", "The same 5–7 hero ingredients become Mexican Monday, Asian Wednesday, Italian Friday. One shopping trip, five completely different dinners."),
+                    ("Sunday Buy-Off", "The one-tap approval screen. Review your week, see your Found Money, tap Approve — the shopping list is ready."),
+                    ("Shopping list by store & category", "Kroger items together, Food Lion items together. No backtracking through the aisles."),
+                    ("Found Money tracking", "Every week WhollyFare shows you what you saved vs. single-store shopping and vs. HelloFresh at $9.99/serving."),
+                ]),
+                ("Perfect for", [
+                    ("Families of 2–6", "Default 4 servings per meal, adjustable to your household."),
+                    ("'What's for dinner?' households", "Sunday Buy-Off turns a weekly stress into a two-minute ritual."),
+                    ("Budget-conscious cooks", "Every meal is 30 minutes or less and uses what was actually on sale this week."),
+                ]),
             ],
-            "cta": "Start planning",
+            "next_tier": {"id": 3, "name": "Health Guard", "price": "$19/mo", "teaser": "Managing allergies or a health condition? Add clinical-grade safety filtering."},
         },
         {
             "id": 3, "color": "#F28B30", "price": "$19", "price_sub": "/ month",
-            "name": "Health Guard", "badge": "",
+            "name": "Health Guard", "badge": "", "cta": "Protect my family",
             "tagline": "Every ingredient checked against your family's health profile.",
-            "features": [
-                "Everything in Meal Planner",
-                "Top-14 allergen hard filtering",
-                "Celiac, MCAS, diabetes, CKD, IBS support",
-                "Per-member household profiles",
-                "Every rejection logged & explained",
+            "features": ["Everything in Meal Planner", "Top-14 allergen hard filtering", "Celiac, MCAS, diabetes, CKD, IBS support", "Per-member household profiles", "Every rejection logged & explained"],
+            "headline": "Safe first. Every single time.",
+            "description": "Meal Planner with a clinical safety layer. Before any ingredient enters your plan, it passes through every constraint in your household's health profile. Hard rules — not suggestions.",
+            "detail_sections": [
+                ("What you get", [
+                    ("Top-14 allergen filtering", "Peanuts, tree nuts, milk, eggs, wheat, soy, fish, shellfish, sesame, mustard, celery, lupin, molluscs, sulphites — any allergen flagged for any member is permanently excluded."),
+                    ("Clinical condition support", "Celiac, MCAS, Type 2 Diabetes, Chronic Kidney Disease (CKD), IBS/Low-FODMAP, GERD, Hypertension, Crohn's — each condition triggers a specific constraint ruleset."),
+                    ("Per-member profiles", "Tim has no restrictions. Abby has celiac. Chas has a peanut allergy. Each member's constraints are respected individually — and the most restrictive applies to the whole household."),
+                    ("Constraint audit log", "Every rejected ingredient is logged with the exact reason: which member, which rule, which item. No black boxes, ever."),
+                    ("Safety before savings, always", "The constraint engine runs before the budget optimizer. WhollyFare will never recommend an unsafe ingredient because it happens to be on sale."),
+                ]),
+                ("Perfect for", [
+                    ("Food allergy households", "One peanut allergy means peanuts never appear — not in a plan, not in a suggestion, not in a 'you might also like.'"),
+                    ("Celiac families", "Every ingredient checked against the full gluten-containing grain list. GF alternatives surfaced automatically."),
+                    ("Complex multi-condition households", "A household with celiac, CKD, and a peanut allergy runs all three rulesets simultaneously without extra work."),
+                ]),
             ],
-            "cta": "Protect my family",
+            "next_tier": {"id": 4, "name": "Full Table", "price": "$29/mo", "teaser": "Want full recipes, cooking instructions, and preference learning?"},
         },
         {
             "id": 4, "color": "#1E5C32", "price": "$29", "price_sub": "/ month",
-            "name": "Full Table", "badge": "",
+            "name": "Full Table", "badge": "", "cta": "Get the full experience",
             "tagline": "Full recipes, cuisine learning, the complete experience.",
-            "features": [
-                "Everything in Health Guard",
-                "Full recipes with prep times & quantities",
-                "Cuisine preference memory",
-                "Meal history & family favourites",
-                "Priority support",
+            "features": ["Everything in Health Guard", "Full recipes with prep times", "Cuisine preference memory", "Meal history & favourites", "Priority support"],
+            "headline": "The complete WhollyFare table.",
+            "description": "Everything in Health Guard, plus full cooking instructions, cuisine preference learning, and meal history. WhollyFare remembers what your family loves and keeps the weekly menu interesting.",
+            "detail_sections": [
+                ("What you get", [
+                    ("Full recipes with prep times", "Step-by-step cooking instructions, ingredient quantities per serving, estimated prep and cook time for every meal."),
+                    ("Cuisine preference memory", "WhollyFare tracks which meals were approved, which were skipped, what your household consistently enjoys — and reflects that in future plans."),
+                    ("Meal history & favourites", "Flag meals as household favourites. WhollyFare brings them back when the same ingredients go on sale again."),
+                    ("Pantry-aware planning (coming soon)", "Tell WhollyFare what's already in your pantry and it won't plan around things you have."),
+                    ("Priority support", "Plan issues, constraint questions, PDF uploads that need a hand — you go to the front of the queue."),
+                ]),
+                ("Perfect for", [
+                    ("Households who actually cook", "Full recipes turn the shopping list into a complete cooking guide."),
+                    ("Long-term WhollyFare users", "The preference memory gets better the longer you use it."),
+                    ("Anyone who wants everything", "From sale price to plated dinner — every step covered in one place."),
+                ]),
             ],
-            "cta": "Get the full experience",
+            "next_tier": None,
         },
     ]
 
-    # Render tier cards
+    # ── Tier sub-page: if ?tier=N is set, render detail view and stop ─────────
+    _tier_param = st.query_params.get("tier")
+    if _tier_param:
+        try:
+            _active = next((t for t in tiers if str(t["id"]) == str(_tier_param)), None)
+        except Exception:
+            _active = None
+
+        if _active:
+            # Back nav
+            if st.button("← Plans & Pricing", key="back_to_plans"):
+                st.query_params.clear()
+                st.rerun()
+
+            c = _active["color"]
+
+            # Tier hero
+            st.markdown(f"""
+            <div style='background:linear-gradient(135deg,#142B1C,#1E5C32);border-radius:16px;
+                        padding:44px 48px 38px;margin-bottom:28px;position:relative;overflow:hidden;'>
+              <svg style='position:absolute;right:-40px;bottom:-40px;opacity:0.06;' width="300" height="300" viewBox="0 0 300 300">
+                <ellipse cx="150" cy="150" rx="130" ry="86" fill="white" transform="rotate(-28 150 150)"/>
+                <line x1="60" y1="220" x2="230" y2="90" stroke="white" stroke-width="4"/>
+              </svg>
+              <div style='font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+                          color:#9FD9A8;margin-bottom:10px;'>Plans &amp; Pricing</div>
+              <div style='display:flex;align-items:baseline;gap:14px;margin-bottom:12px;'>
+                <span style='font-size:2.4rem;font-weight:800;color:white;letter-spacing:-0.02em;'>{_active["name"]}</span>
+                <span style='font-size:2rem;font-weight:800;color:{c};'>{_active["price"]}</span>
+                <span style='font-size:0.9rem;color:rgba(255,255,255,0.6);'>{_active["price_sub"]}</span>
+              </div>
+              <div style='font-size:1.1rem;font-weight:600;color:white;margin-bottom:8px;'>{_active["headline"]}</div>
+              <div style='font-size:0.95rem;color:rgba(255,255,255,0.78);max-width:580px;line-height:1.65;'>
+                {_active["description"]}
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Detail sections
+            for section_title, items in _active["detail_sections"]:
+                st.markdown(f"""
+                <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+                            color:{c};margin-bottom:10px;margin-top:20px;'>{section_title}</div>
+                """, unsafe_allow_html=True)
+                for item_title, item_desc in items:
+                    st.markdown(f"""
+                    <div style='background:white;border-radius:10px;padding:16px 18px;margin-bottom:8px;
+                                border-left:3px solid {c};box-shadow:0 1px 8px rgba(30,92,50,0.06);'>
+                      <div style='font-weight:700;font-size:0.93rem;color:#1A2E1D;margin-bottom:3px;'>
+                        <span style='color:{c};margin-right:6px;'>✓</span>{item_title}
+                      </div>
+                      <div style='font-size:0.84rem;color:#5A6B5E;line-height:1.55;padding-left:22px;'>{item_desc}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # Next tier teaser
+            if _active["next_tier"]:
+                nt = _active["next_tier"]
+                st.markdown(f"""
+                <div style='background:#F4FAF5;border:1px solid #D8EDD0;border-radius:10px;
+                            padding:16px 20px;margin-top:24px;display:flex;
+                            justify-content:space-between;align-items:center;'>
+                  <div>
+                    <div style='font-size:0.8rem;color:#5A7A62;'>Next tier up</div>
+                    <div style='font-weight:600;color:#1E5C32;'>{nt["name"]} — {nt["price"]}</div>
+                    <div style='font-size:0.83rem;color:#5A6B5E;margin-top:2px;'>{nt["teaser"]}</div>
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button(f"See {nt['name']} →", key="next_tier_btn"):
+                    st.query_params["tier"] = str(nt["id"])
+                    st.rerun()
+
+            # CTA
+            st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
+            cta_a, cta_b, _ = st.columns([2, 1, 3])
+            with cta_a:
+                if st.button(f"🌿 Start with {_active['name']}", type="primary", use_container_width=True):
+                    st.query_params.clear()
+                    st.switch_page("pages/1_Household.py")
+            with cta_b:
+                if st.button("← All plans", use_container_width=True):
+                    st.query_params.clear()
+                    st.rerun()
+
+            st.stop()
+
+    # ── Pricing tier cards ─────────────────────────────────────────────────────
     t1, t2, t3, t4 = st.columns(4)
     for col, tier in zip([t1, t2, t3, t4], tiers):
         badge_html = (
@@ -353,46 +482,8 @@ if not state.is_setup_complete():
             """, unsafe_allow_html=True)
 
             if st.button(f"{tier['cta']} →", key=f"tier_{tier['id']}", use_container_width=True):
-                current = st.session_state.get("tier_detail")
-                st.session_state["tier_detail"] = tier["id"] if current != tier["id"] else None
+                st.query_params["tier"] = str(tier["id"])
                 st.rerun()
-
-    # ── Tier detail expand panel ───────────────────────────────────────────────
-    active_id = st.session_state.get("tier_detail")
-    if active_id:
-        active = next((t for t in tiers if t["id"] == active_id), None)
-        if active:
-            feats_grid = "".join(
-                f"<div style='display:flex;gap:8px;align-items:flex-start;'>"
-                f"<span style='color:{active['color']};font-size:0.9rem;flex-shrink:0;'>✓</span>"
-                f"<span style='font-size:0.85rem;color:#333;line-height:1.5;'>{f}</span></div>"
-                for f in active["features"]
-            )
-            st.markdown(f"""
-            <div class='wf-detail' style='background:white;border-radius:14px;
-                        border-left:5px solid {active["color"]};
-                        box-shadow:0 6px 36px rgba(30,92,50,0.12);
-                        padding:28px 32px;margin-top:16px;'>
-              <div style='display:flex;align-items:baseline;gap:10px;margin-bottom:6px;'>
-                <span style='font-size:1.2rem;font-weight:800;color:#1A2E1D;'>{active["name"]}</span>
-                <span style='font-size:1.4rem;font-weight:800;color:{active["color"]};'>{active["price"]}</span>
-                <span style='font-size:0.8rem;color:#9AA8A0;'>{active["price_sub"]}</span>
-              </div>
-              <div style='font-size:0.9rem;color:#5A6B5E;margin-bottom:20px;'>{active["tagline"]}</div>
-              <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;'>
-                {feats_grid}
-              </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            dc1, dc2, dc3 = st.columns([1, 2, 4])
-            with dc1:
-                if st.button("✕ Close", key="close_tier"):
-                    st.session_state["tier_detail"] = None
-                    st.rerun()
-            with dc2:
-                if st.button(f"🌿 Start with {active['name']}", type="primary", key="tier_cta"):
-                    st.switch_page("pages/1_Household.py")
 
     st.markdown("<div style='height:32px;'></div>", unsafe_allow_html=True)
 
@@ -473,10 +564,12 @@ if history:
     for entry in reversed(history[-5:]):
         c1, c2, c3, c4 = st.columns([3, 2, 2, 2])
         with c1:
-            st.caption(f"**Week of {entry.get('week','—')}**  ·  {entry.get('meals',0)} dinners")
+            st.caption(f"**Week of {entry.get('week','—')}**  ·  {entry.get('meals_planned', 0)} dinners")
         with c2:
-            st.caption(f"${entry.get('plan_cost',0):.2f} spent")
+            st.caption(f"${entry.get('whollyfare_cost', 0):.2f} spent")
         with c3:
-            st.caption(f"${entry.get('found_money',0):.2f} found")
+            st.caption(f"💚 ${entry.get('found_money', 0):.2f} found")
         with c4:
-            st.caption(f"📍 {entry.get('primary_grocer','—')}")
+            stores_n = entry.get('stores_used', 1)
+            grocer_txt = "Kroger + Food Lion" if stores_n >= 2 else "Kroger"
+            st.caption(f"📍 {grocer_txt}")

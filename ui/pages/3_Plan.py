@@ -177,21 +177,50 @@ for meal in meals:
 st.divider()
 
 # ── Constraint compliance ─────────────────────────────────────────────────────
+household = st.session_state.get("household")
+_constraint_parts = []
+if household:
+    _allergens = set()
+    _diagnoses = set()
+    _lifestyle = set()
+    for _m in household.members:
+        _allergens.update(_m.allergies)
+        _diagnoses.update(d.value for d in _m.diagnoses)
+        _lifestyle.update(t.value for t in _m.lifestyle_tags)
+
+    if "celiac" in _diagnoses:
+        _constraint_parts.append("Gluten-free compliant")
+    if _allergens:
+        _allergen_str = ", ".join(
+            a.replace("_", " ").capitalize() for a in sorted(_allergens)
+        )
+        _constraint_parts.append(f"No {_allergen_str}")
+    if "type1_diabetes" in _diagnoses or "type2_diabetes" in _diagnoses:
+        _constraint_parts.append("Diabetes-aware")
+    if "ibs_low_fodmap" in _diagnoses:
+        _constraint_parts.append("Low-FODMAP")
+    if "ckd" in _diagnoses:
+        _constraint_parts.append("CKD-safe")
+    if "hypertension" in _diagnoses:
+        _constraint_parts.append("Low-sodium")
+    for _t in sorted(_lifestyle):
+        _constraint_parts.append(_t.replace("_", "-").capitalize())
+
+_constraint_str = " · ".join(_constraint_parts) if _constraint_parts else "Standard filtering applied"
+
 st.markdown(
-    """<div style='background:#E3F4E8;border:1px solid #5DAA6A;border-radius:10px;
+    f"""<div style='background:#E3F4E8;border:1px solid #5DAA6A;border-radius:10px;
                    padding:14px 18px;margin-bottom:20px;'>
       <span style='font-size:1rem;font-weight:700;color:#1E5C32;'>
-        ✅ All 5 meals are safe for your household
+        ✅ All {len(meals)} meals are safe for your household
       </span>
       <span style='font-size:0.85rem;color:#3A8C4E;margin-left:12px;'>
-        Gluten-free compliant · No peanuts · No tree nuts
+        {_constraint_str}
       </span>
     </div>""",
     unsafe_allow_html=True,
 )
 
 # ── CTA ───────────────────────────────────────────────────────────────────────
-if st.button("✅ Approve this week's plan →", type="primary"):
+if st.button("✅ Go to Sunday Buy-Off — approve this week →", type="primary", use_container_width=True):
     st.switch_page("pages/4_Sunday_BuyOff.py")
-
-st.page_link("pages/4_Sunday_BuyOff.py", label="→ Go to Sunday Buy-Off")
