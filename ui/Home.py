@@ -78,31 +78,48 @@ total_saved = sum(e.get("found_money", 0) for e in history)
 # ════════════════════════════════════════════════════════════════════════════════
 if not state.is_setup_complete():
 
-    # ── Page-level earthy background + pull content up ────────────────────────
+    # ── CSS + page treatment ──────────────────────────────────────────────────
     st.markdown("""
     <style>
-      /* Pull the page content right up to the top */
-      .block-container { padding-top: 1rem !important; }
+      .block-container { padding-top: 0.5rem !important; }
 
-      /* Earthy organic background — soft sage radials on cream */
       [data-testid="stAppViewContainer"] > .main {
         background:
-          radial-gradient(ellipse at 15% 8%,  rgba(93,170,106,0.10) 0%, transparent 45%),
-          radial-gradient(ellipse at 85% 5%,  rgba(30,92,50,0.07)  0%, transparent 40%),
-          radial-gradient(ellipse at 50% 85%, rgba(93,170,106,0.07) 0%, transparent 50%),
-          radial-gradient(ellipse at 90% 60%, rgba(242,139,48,0.05) 0%, transparent 35%),
+          radial-gradient(ellipse at 12% 6%,  rgba(93,170,106,0.12) 0%, transparent 48%),
+          radial-gradient(ellipse at 88% 4%,  rgba(30,92,50,0.08)  0%, transparent 42%),
+          radial-gradient(ellipse at 50% 90%, rgba(93,170,106,0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at 92% 65%, rgba(242,139,48,0.06) 0%, transparent 38%),
           #FAFAF7;
+      }
+
+      [data-testid="stSidebarNav"] { display: none !important; }
+
+      /* Smooth lift on hover for any wf-card class */
+      .wf-card {
+        transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+      }
+      .wf-card:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 16px 48px rgba(30,92,50,0.16) !important;
+      }
+
+      /* Tier detail expand panel */
+      .wf-detail {
+        animation: slideDown 0.22s ease;
+      }
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
     </style>
     """, unsafe_allow_html=True)
 
-    # ── Page header — brand + company attribution ─────────────────────────────
+    # ── Brand header ──────────────────────────────────────────────────────────
     st.markdown("""
-    <div style='display:flex;align-items:center;gap:10px;margin-bottom:14px;
+    <div style='display:flex;align-items:center;gap:10px;margin-bottom:16px;
                 padding:10px 18px;background:rgba(255,255,255,0.55);
                 backdrop-filter:blur(6px);border-radius:10px;
-                border:1px solid rgba(93,170,106,0.25);'>
-      <!-- Leaf inline SVG -->
+                border:1px solid rgba(93,170,106,0.22);'>
       <svg width="26" height="26" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
         <line x1="14" y1="46" x2="14" y2="10" stroke="#3A8C4E" stroke-width="2.8" stroke-linecap="round"/>
         <line x1="9"  y1="10" x2="9"  y2="24" stroke="#3A8C4E" stroke-width="2"   stroke-linecap="round"/>
@@ -112,114 +129,289 @@ if not state.is_setup_complete():
         <line x1="24" y1="35" x2="46" y2="18" stroke="#9FD9A8" stroke-width="1.3" stroke-linecap="round"/>
       </svg>
       <span style='font-size:1.05rem;font-weight:700;color:#1E5C32;'>WhollyFare</span>
-      <span style='color:#C8DFC8;margin:0 2px;'>·</span>
-      <span style='font-size:0.83rem;color:#555;'>
-        a <a href="https://sentir-solutions.com" target="_blank"
-             style="color:#3A8C4E;font-weight:600;text-decoration:none;">Sentir Solutions</a>&#174; Company
-      </span>
+      <span style='color:#C8DFC8;margin:0 4px;'>·</span>
+      <span style='font-size:0.82rem;color:#666;'>a <a href="https://sentir-solutions.com" target="_blank"
+           style="color:#3A8C4E;font-weight:600;text-decoration:none;">Sentir Solutions</a>&#174; Company</span>
     </div>
     """, unsafe_allow_html=True)
 
     # ── Hero ──────────────────────────────────────────────────────────────────
     st.markdown("""
-    <div style='background:linear-gradient(135deg,#1E5C32,#3A8C4E);border-radius:14px;
-                padding:36px 40px 32px 40px;margin-bottom:24px;text-align:center;'>
-      <div style='font-size:2.2rem;font-weight:700;color:white;line-height:1.15;margin-bottom:10px;'>
-        Eat well. Spend less.<br>Every week.
+    <div style='position:relative;overflow:hidden;
+                background:linear-gradient(140deg,#142B1C 0%,#1E5C32 55%,#2D7A45 100%);
+                border-radius:18px;padding:54px 52px 50px;margin-bottom:10px;'>
+
+      <!-- Decorative leaf watermark (bottom-right) -->
+      <svg style='position:absolute;right:-60px;bottom:-60px;opacity:0.06;pointer-events:none;'
+           width="420" height="420" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="210" cy="210" rx="180" ry="120" fill="white" transform="rotate(-28 210 210)"/>
+        <line x1="80"  y1="310" x2="330" y2="120" stroke="white" stroke-width="5"/>
+        <line x1="110" y1="340" x2="240" y2="155" stroke="white" stroke-width="2.5" opacity="0.7"/>
+        <line x1="200" y1="290" x2="330" y2="155" stroke="white" stroke-width="2.5" opacity="0.7"/>
+      </svg>
+
+      <!-- Small top badge -->
+      <div style='display:inline-flex;align-items:center;gap:7px;
+                  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);
+                  border-radius:20px;padding:5px 14px;margin-bottom:20px;'>
+        <span style='width:7px;height:7px;background:#5DAA6A;border-radius:50%;display:inline-block;'></span>
+        <span style='font-size:0.72rem;font-weight:600;letter-spacing:0.1em;
+                     text-transform:uppercase;color:rgba(255,255,255,0.85);'>
+          Smart meal planning &nbsp;·&nbsp; Sincere savings
+        </span>
       </div>
-      <div style='font-size:1rem;color:rgba(255,255,255,0.85);margin-bottom:24px;'>
-        Your weekly meal plan built from <em>this week's</em> sale prices at your local stores.
+
+      <!-- Headline -->
+      <div style='font-size:3.1rem;font-weight:800;color:white;line-height:1.08;
+                  letter-spacing:-0.025em;margin-bottom:16px;'>
+        The meal plan<br>that pays you back.
       </div>
-      <div style='display:flex;gap:16px;flex-wrap:wrap;justify-content:center;'>
-        <div style='background:rgba(255,255,255,0.15);border-radius:10px;padding:12px 24px;min-width:130px;'>
-          <div style='font-size:1.7rem;font-weight:700;color:white;'>15–25%</div>
-          <div style='font-size:0.8rem;color:rgba(255,255,255,0.75);margin-top:3px;'>avg. grocery savings</div>
+
+      <!-- Subhead -->
+      <div style='font-size:1.05rem;color:rgba(255,255,255,0.75);
+                  max-width:500px;line-height:1.65;margin-bottom:38px;'>
+        Built from this week's actual sale prices at your local grocery stores —
+        no subscriptions, no ads, no one getting paid to put food on your plate.
+      </div>
+
+      <!-- Stats row -->
+      <div style='display:flex;gap:14px;flex-wrap:wrap;'>
+        <div style='background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);
+                    border:1px solid rgba(255,255,255,0.14);border-radius:12px;
+                    padding:16px 24px;min-width:130px;'>
+          <div style='font-size:2.1rem;font-weight:800;color:white;line-height:1;'>15–25%</div>
+          <div style='font-size:0.74rem;color:rgba(255,255,255,0.6);margin-top:5px;letter-spacing:0.02em;'>
+            avg. grocery savings
+          </div>
         </div>
-        <div style='background:rgba(255,255,255,0.15);border-radius:10px;padding:12px 24px;min-width:130px;'>
-          <div style='font-size:1.7rem;font-weight:700;color:#F28B30;'>~$2–4</div>
-          <div style='font-size:0.8rem;color:rgba(255,255,255,0.75);margin-top:3px;'>per serving vs. $9.99 meal kits</div>
+        <div style='background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);
+                    border:1px solid rgba(255,255,255,0.14);border-radius:12px;
+                    padding:16px 24px;min-width:130px;'>
+          <div style='font-size:2.1rem;font-weight:800;color:#F28B30;line-height:1;'>~$2–4</div>
+          <div style='font-size:0.74rem;color:rgba(255,255,255,0.6);margin-top:5px;letter-spacing:0.02em;'>
+            per serving vs. $9.99 meal kits
+          </div>
         </div>
-        <div style='background:rgba(255,255,255,0.15);border-radius:10px;padding:12px 24px;min-width:130px;'>
-          <div style='font-size:1.7rem;font-weight:700;color:white;'>$0</div>
-          <div style='font-size:0.8rem;color:rgba(255,255,255,0.75);margin-top:3px;'>paid placements. Ever.</div>
+        <div style='background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);
+                    border:1px solid rgba(255,255,255,0.14);border-radius:12px;
+                    padding:16px 24px;min-width:130px;'>
+          <div style='font-size:2.1rem;font-weight:800;color:white;line-height:1;'>$0</div>
+          <div style='font-size:0.74rem;color:rgba(255,255,255,0.6);margin-top:5px;letter-spacing:0.02em;'>
+            paid placements. Ever.
+          </div>
         </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
+
+    # CTA buttons sit flush below the hero
+    h1, h2, h3 = st.columns([2, 2, 3])
+    with h1:
+        if st.button("🌿 Get started free", type="primary", use_container_width=True):
+            st.switch_page("pages/1_Household.py")
+    with h2:
+        if st.button("📈 Investor brief", use_container_width=True):
+            st.switch_page("pages/7_Investor.py")
+
+    st.markdown("<div style='height:36px;'></div>", unsafe_allow_html=True)
 
     # ── How it works ──────────────────────────────────────────────────────────
     st.markdown("""
-    <div style='text-align:center;margin-bottom:20px;'>
-      <div style='font-size:1.3rem;font-weight:600;color:#1E5C32;'>Three steps. Every Sunday.</div>
+    <div style='text-align:center;margin-bottom:22px;'>
+      <div style='font-size:0.7rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;
+                  color:#5DAA6A;margin-bottom:6px;'>How it works</div>
+      <div style='font-size:1.55rem;font-weight:700;color:#1A2E1D;letter-spacing:-0.01em;'>
+        Three steps. Every Sunday.
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns(3)
-    for col, icon, step, title in zip(
-        [c1, c2, c3],
+    s1, s2, s3 = st.columns(3)
+    for col, icon, num, title, desc in zip(
+        [s1, s2, s3],
         ["🏪", "🛡️", "✅"],
         ["01", "02", "03"],
         ["Load your stores", "We build your plan", "One tap to approve"],
+        [
+            "Pull this week's prices from Kroger live or PDF upload. We read the deals, not the ads.",
+            "Safe, affordable meals from this week's best-priced ingredients — filtered for your family.",
+            "Review dinners + Found Money on the Sunday Buy-Off screen. One tap sends the shopping list.",
+        ],
     ):
         with col:
             st.markdown(f"""
-            <div style='background:#F4FAF5;border:1px solid #D8EDD0;border-radius:10px;
-                        padding:22px 18px;text-align:center;'>
-              <div style='font-size:2rem;margin-bottom:6px;'>{icon}</div>
-              <div style='font-size:0.7rem;font-weight:700;letter-spacing:0.12em;color:#5DAA6A;margin-bottom:6px;'>STEP {step}</div>
-              <div style='font-weight:600;font-size:0.95rem;color:#1E5C32;'>{title}</div>
+            <div class='wf-card' style='background:white;border-radius:14px;padding:28px 22px 24px;
+                        box-shadow:0 2px 20px rgba(30,92,50,0.07);text-align:center;'>
+              <div style='width:48px;height:48px;background:linear-gradient(135deg,#E8F5EC,#D0EDD8);
+                          border-radius:50%;display:flex;align-items:center;justify-content:center;
+                          margin:0 auto 14px;font-size:1.4rem;'>{icon}</div>
+              <div style='font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+                          color:#5DAA6A;margin-bottom:6px;'>Step {num}</div>
+              <div style='font-weight:700;font-size:1rem;color:#1A2E1D;margin-bottom:9px;'>{title}</div>
+              <div style='font-size:0.84rem;color:#5A6B5E;line-height:1.6;'>{desc}</div>
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<div style='margin-bottom:32px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:40px;'></div>", unsafe_allow_html=True)
 
-    # ── Tiers ─────────────────────────────────────────────────────────────────
+    # ── Pricing tiers ─────────────────────────────────────────────────────────
     st.markdown("""
-    <div style='text-align:center;margin-bottom:20px;'>
-      <div style='font-size:1.3rem;font-weight:600;color:#1E5C32;'>Start free. Add what your family needs.</div>
+    <div style='text-align:center;margin-bottom:22px;'>
+      <div style='font-size:0.7rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;
+                  color:#5DAA6A;margin-bottom:6px;'>Plans & pricing</div>
+      <div style='font-size:1.55rem;font-weight:700;color:#1A2E1D;letter-spacing:-0.01em;'>
+        Start free. Add what your family needs.
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
+    tiers = [
+        {
+            "id": 1, "color": "#3A8C4E", "price": "Free", "price_sub": "forever",
+            "name": "Price Finder", "badge": "",
+            "tagline": "See where the savings are before you ever shop.",
+            "features": [
+                "Compare prices across all your local stores",
+                "Digital coupon matching, automated",
+                "Weekly savings report",
+                "No credit card needed",
+            ],
+            "cta": "Get started",
+        },
+        {
+            "id": 2, "color": "#5DAA6A", "price": "$7", "price_sub": "/ month",
+            "name": "Meal Planner", "badge": "Most popular",
+            "tagline": "Five dinners planned around this week's best prices.",
+            "features": [
+                "Everything in Price Finder",
+                "Weekly 5-dinner meal plan",
+                "Flavor Plugins — same ingredients, different cuisines",
+                "Sunday Buy-Off approval screen",
+                "Shopping list by store & category",
+            ],
+            "cta": "Start planning",
+        },
+        {
+            "id": 3, "color": "#F28B30", "price": "$19", "price_sub": "/ month",
+            "name": "Health Guard", "badge": "",
+            "tagline": "Every ingredient checked against your family's health profile.",
+            "features": [
+                "Everything in Meal Planner",
+                "Top-14 allergen hard filtering",
+                "Celiac, MCAS, diabetes, CKD, IBS support",
+                "Per-member household profiles",
+                "Every rejection logged & explained",
+            ],
+            "cta": "Protect my family",
+        },
+        {
+            "id": 4, "color": "#1E5C32", "price": "$29", "price_sub": "/ month",
+            "name": "Full Table", "badge": "",
+            "tagline": "Full recipes, cuisine learning, the complete experience.",
+            "features": [
+                "Everything in Health Guard",
+                "Full recipes with prep times & quantities",
+                "Cuisine preference memory",
+                "Meal history & family favourites",
+                "Priority support",
+            ],
+            "cta": "Get the full experience",
+        },
+    ]
+
+    # Render tier cards
     t1, t2, t3, t4 = st.columns(4)
-    for col, color, tier, label in zip(
-        [t1, t2, t3, t4],
-        ["#3A8C4E", "#5DAA6A", "#F28B30", "#1E5C32"],
-        ["Free", "$5–10/mo", "$15–25/mo", "Full bundle"],
-        ["Compare prices across stores", "Meal plan + weekly buy-off", "Health & allergy filtering", "Full recipes + preferences"],
-    ):
+    for col, tier in zip([t1, t2, t3, t4], tiers):
+        badge_html = (
+            f"<div style='display:inline-block;background:{tier['color']};color:white;"
+            f"font-size:0.65rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;"
+            f"border-radius:20px;padding:3px 10px;margin-bottom:12px;'>{tier['badge']}</div>"
+            if tier["badge"] else "<div style='height:24px;'></div>"
+        )
+        feats = "".join(
+            f"<div style='display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;'>"
+            f"<span style='color:{tier['color']};font-size:0.85rem;margin-top:1px;flex-shrink:0;'>✓</span>"
+            f"<span style='font-size:0.8rem;color:#4A5568;line-height:1.45;'>{f}</span></div>"
+            for f in tier["features"]
+        )
         with col:
             st.markdown(f"""
-            <div style='border-top:4px solid {color};background:white;
-                        border:1px solid #D8EDD0;border-top:4px solid {color};
-                        border-radius:0 0 10px 10px;padding:16px;text-align:center;'>
-              <div style='font-size:1.1rem;font-weight:700;color:{color};margin-bottom:6px;'>{tier}</div>
-              <div style='font-size:0.83rem;color:#444;'>{label}</div>
+            <div class='wf-card' style='background:white;border-radius:14px;
+                        border-top:4px solid {tier["color"]};
+                        box-shadow:0 2px 22px rgba(30,92,50,0.08);
+                        padding:22px 18px 14px;min-height:340px;'>
+              {badge_html}
+              <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;
+                          text-transform:uppercase;color:{tier["color"]};margin-bottom:6px;'>
+                {tier["name"]}
+              </div>
+              <div style='margin-bottom:10px;line-height:1;'>
+                <span style='font-size:2rem;font-weight:800;color:#1A2E1D;'>{tier["price"]}</span>
+                <span style='font-size:0.76rem;color:#9AA8A0;margin-left:3px;'>{tier["price_sub"]}</span>
+              </div>
+              <div style='font-size:0.82rem;color:#5A6B5E;line-height:1.5;margin-bottom:14px;
+                          min-height:36px;'>{tier["tagline"]}</div>
+              <div style='border-top:1px solid #F0F4F1;padding-top:14px;'>
+                {feats}
+              </div>
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<div style='margin-bottom:32px;'></div>", unsafe_allow_html=True)
+            if st.button(f"{tier['cta']} →", key=f"tier_{tier['id']}", use_container_width=True):
+                current = st.session_state.get("tier_detail")
+                st.session_state["tier_detail"] = tier["id"] if current != tier["id"] else None
+                st.rerun()
 
-    # ── Trust line ────────────────────────────────────────────────────────────
+    # ── Tier detail expand panel ───────────────────────────────────────────────
+    active_id = st.session_state.get("tier_detail")
+    if active_id:
+        active = next((t for t in tiers if t["id"] == active_id), None)
+        if active:
+            feats_grid = "".join(
+                f"<div style='display:flex;gap:8px;align-items:flex-start;'>"
+                f"<span style='color:{active['color']};font-size:0.9rem;flex-shrink:0;'>✓</span>"
+                f"<span style='font-size:0.85rem;color:#333;line-height:1.5;'>{f}</span></div>"
+                for f in active["features"]
+            )
+            st.markdown(f"""
+            <div class='wf-detail' style='background:white;border-radius:14px;
+                        border-left:5px solid {active["color"]};
+                        box-shadow:0 6px 36px rgba(30,92,50,0.12);
+                        padding:28px 32px;margin-top:16px;'>
+              <div style='display:flex;align-items:baseline;gap:10px;margin-bottom:6px;'>
+                <span style='font-size:1.2rem;font-weight:800;color:#1A2E1D;'>{active["name"]}</span>
+                <span style='font-size:1.4rem;font-weight:800;color:{active["color"]};'>{active["price"]}</span>
+                <span style='font-size:0.8rem;color:#9AA8A0;'>{active["price_sub"]}</span>
+              </div>
+              <div style='font-size:0.9rem;color:#5A6B5E;margin-bottom:20px;'>{active["tagline"]}</div>
+              <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;'>
+                {feats_grid}
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            dc1, dc2, dc3 = st.columns([1, 2, 4])
+            with dc1:
+                if st.button("✕ Close", key="close_tier"):
+                    st.session_state["tier_detail"] = None
+                    st.rerun()
+            with dc2:
+                if st.button(f"🌿 Start with {active['name']}", type="primary", key="tier_cta"):
+                    st.switch_page("pages/1_Household.py")
+
+    st.markdown("<div style='height:32px;'></div>", unsafe_allow_html=True)
+
+    # ── Trust bar ────────────────────────────────────────────────────────────
     st.markdown("""
-    <div style='text-align:center;padding:18px;background:#F4FAF5;border-radius:10px;
-                border:1px solid #D8EDD0;margin-bottom:32px;'>
-      <span style='color:#1E5C32;font-size:0.92rem;'>
-        🚫 No paid placements &nbsp;·&nbsp; 🛡️ Health constraints are hard rules &nbsp;·&nbsp;
+    <div style='text-align:center;padding:15px 20px;
+                background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);
+                border-radius:10px;border:1px solid rgba(93,170,106,0.18);'>
+      <span style='font-size:0.85rem;color:#3A6645;font-weight:500;'>
+        🚫 No paid placements &nbsp;·&nbsp; 🛡️ Health rules are absolute &nbsp;·&nbsp;
         🔍 Every pick shows its reason &nbsp;·&nbsp; 🔐 Your data is yours
       </span>
     </div>
     """, unsafe_allow_html=True)
-
-    # ── CTA ───────────────────────────────────────────────────────────────────
-    cta_l, cta_c, cta_r = st.columns([1, 2, 1])
-    with cta_c:
-        if st.button("👨‍👩‍👧 Get started — it's free", use_container_width=True, type="primary"):
-            st.switch_page("pages/1_Household.py")
-
-    cta2_l, cta2_c, cta2_r = st.columns([2, 1, 2])
-    with cta2_c:
-        if st.button("📈 Investor brief", use_container_width=True):
-            st.switch_page("pages/7_Investor.py")
 
     st.stop()
 
