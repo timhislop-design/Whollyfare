@@ -23,22 +23,30 @@ state.init()
 # ── Sidebar brand mark ────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
-    <div style='padding: 14px 0 22px 0;'>
-      <svg width="130" height="34" viewBox="0 0 130 34" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(3, 2)">
-          <line x1="8"  y1="29" x2="8"  y2="6"  stroke="#9FD9A8" stroke-width="2"   stroke-linecap="round"/>
-          <line x1="5"  y1="6"  x2="5"  y2="16" stroke="#9FD9A8" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="8"  y1="6"  x2="8"  y2="16" stroke="#9FD9A8" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="11" y1="6"  x2="11" y2="16" stroke="#9FD9A8" stroke-width="1.5" stroke-linecap="round"/>
-          <ellipse cx="19" cy="15" rx="8.5" ry="5.5" fill="#5DAA6A" transform="rotate(-28 19 15)"/>
-          <line x1="12" y1="20" x2="24" y2="11" stroke="#9FD9A8" stroke-width="0.9" stroke-linecap="round"/>
-        </g>
-        <text x="34" y="22" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="white">WhollyFare</text>
+    <style>
+      /* Hide Streamlit's auto-generated page nav so our custom nav is the only one */
+      [data-testid="stSidebarNav"] { display: none !important; }
+    </style>
+
+    <!-- Leaf mark — sits above Home / all nav items -->
+    <div style='padding: 18px 0 6px 4px;'>
+      <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+        <!-- Fork handle -->
+        <line x1="14" y1="46" x2="14" y2="10" stroke="#9FD9A8" stroke-width="2.8" stroke-linecap="round"/>
+        <!-- Fork tines -->
+        <line x1="9"  y1="10" x2="9"  y2="24" stroke="#9FD9A8" stroke-width="2"   stroke-linecap="round"/>
+        <line x1="14" y1="10" x2="14" y2="24" stroke="#9FD9A8" stroke-width="2"   stroke-linecap="round"/>
+        <line x1="19" y1="10" x2="19" y2="24" stroke="#9FD9A8" stroke-width="2"   stroke-linecap="round"/>
+        <!-- Leaf body -->
+        <ellipse cx="36" cy="26" rx="13" ry="8.5" fill="#5DAA6A" transform="rotate(-28 36 26)"/>
+        <!-- Leaf midrib -->
+        <line x1="24" y1="35" x2="46" y2="18" stroke="#9FD9A8" stroke-width="1.3" stroke-linecap="round"/>
       </svg>
-      <div style='font-size:11px; color:#9FD9A8; margin-top:2px; margin-left:2px;'>
-        Eat well. Spend less.
-      </div>
     </div>
+    <!-- Wordmark under the leaf -->
+    <div style='font-size:15px;font-weight:700;color:white;letter-spacing:0.02em;
+                padding:0 0 4px 4px;'>WhollyFare</div>
+    <div style='font-size:10px;color:#9FD9A8;padding:0 0 18px 4px;'>Eat well. Spend less.</div>
     """, unsafe_allow_html=True)
 
     st.markdown("---")
@@ -86,6 +94,30 @@ if not state.is_setup_complete():
           #FAFAF7;
       }
     </style>
+    """, unsafe_allow_html=True)
+
+    # ── Page header — brand + company attribution ─────────────────────────────
+    st.markdown("""
+    <div style='display:flex;align-items:center;gap:10px;margin-bottom:14px;
+                padding:10px 18px;background:rgba(255,255,255,0.55);
+                backdrop-filter:blur(6px);border-radius:10px;
+                border:1px solid rgba(93,170,106,0.25);'>
+      <!-- Leaf inline SVG -->
+      <svg width="26" height="26" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+        <line x1="14" y1="46" x2="14" y2="10" stroke="#3A8C4E" stroke-width="2.8" stroke-linecap="round"/>
+        <line x1="9"  y1="10" x2="9"  y2="24" stroke="#3A8C4E" stroke-width="2"   stroke-linecap="round"/>
+        <line x1="14" y1="10" x2="14" y2="24" stroke="#3A8C4E" stroke-width="2"   stroke-linecap="round"/>
+        <line x1="19" y1="10" x2="19" y2="24" stroke="#3A8C4E" stroke-width="2"   stroke-linecap="round"/>
+        <ellipse cx="36" cy="26" rx="13" ry="8.5" fill="#5DAA6A" transform="rotate(-28 36 26)"/>
+        <line x1="24" y1="35" x2="46" y2="18" stroke="#9FD9A8" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <span style='font-size:1.05rem;font-weight:700;color:#1E5C32;'>WhollyFare</span>
+      <span style='color:#C8DFC8;margin:0 2px;'>·</span>
+      <span style='font-size:0.83rem;color:#555;'>
+        a <a href="https://sentir-solutions.com" target="_blank"
+             style="color:#3A8C4E;font-weight:600;text-decoration:none;">Sentir Solutions</a>&#174; Company
+      </span>
+    </div>
     """, unsafe_allow_html=True)
 
     # ── Hero ──────────────────────────────────────────────────────────────────
