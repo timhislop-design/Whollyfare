@@ -84,12 +84,7 @@ if not state.is_setup_complete():
       .block-container { padding-top: 0.5rem !important; }
 
       [data-testid="stAppViewContainer"] > .main {
-        background:
-          radial-gradient(ellipse at 12% 6%,  rgba(93,170,106,0.12) 0%, transparent 48%),
-          radial-gradient(ellipse at 88% 4%,  rgba(30,92,50,0.08)  0%, transparent 42%),
-          radial-gradient(ellipse at 50% 90%, rgba(93,170,106,0.08) 0%, transparent 50%),
-          radial-gradient(ellipse at 92% 65%, rgba(242,139,48,0.06) 0%, transparent 38%),
-          #FAFAF7;
+        background: #FAFAF7;
       }
 
       [data-testid="stSidebarNav"] { display: none !important; }
