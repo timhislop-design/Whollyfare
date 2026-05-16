@@ -106,6 +106,10 @@ if not state.is_setup_complete():
         from { opacity: 0; transform: translateY(-8px); }
         to   { opacity: 1; transform: translateY(0); }
       }
+      /* Hide hero brand icon on mobile so it doesn't overlap text */
+      @media (max-width: 768px) {
+        .wf-hero-icon { display: none !important; }
+      }
     </style>
     """, unsafe_allow_html=True)
 
@@ -137,7 +141,7 @@ if not state.is_setup_complete():
                 border-radius:18px;padding:54px 52px 50px;margin-bottom:10px;'>
 
       <!-- Decorative fork+leaf — right side, vertically centred in text block, background only -->
-      <svg style='position:absolute;right:60px;top:50%;transform:translateY(-55%);
+      <svg class='wf-hero-icon' style='position:absolute;right:60px;top:50%;transform:translateY(-55%);
                   opacity:0.80;pointer-events:none;'
            width="200" height="200" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"
            aria-hidden="true">
