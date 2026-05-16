@@ -976,7 +976,251 @@ st.divider()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 14. THE CLOSE — open door, not a round
+# 14. APPLICATION ROADMAP — month by month, pilot driven
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("""
+<div style='font-size:0.65rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;
+            color:#5DAA6A;margin-bottom:6px;'>Section 14</div>
+<div style='font-size:1.45rem;font-weight:800;color:#1E5C32;margin-bottom:4px;'>
+  Application Roadmap
+</div>
+<div style='font-size:0.88rem;color:#5A7A62;margin-bottom:14px;line-height:1.65;'>
+  What we're building, when, and why — driven by real pilot data, not theory.
+  Every item moves forward because a household told us it needed to.
+</div>
+<div style='background:#1E5C32;color:white;border-radius:10px;padding:14px 20px;margin-bottom:20px;
+            font-size:0.9rem;line-height:1.65;'>
+  <strong style='color:#9FD9A8;'>Charlottesville is the test bed. Not the goal.</strong><br>
+  The pilot proves the model works for one family at four stores in one city.
+  The roadmap shows how that model becomes the meal planning layer for any household,
+  at any store, in any market in the country — built on direct API integrations with
+  the grocer chains that already serve them.
+</div>
+""", unsafe_allow_html=True)
+
+with st.expander("Month 1 — Hislop Family Pilot · Live Now", expanded=False):
+    st.markdown("""
+<div style='font-size:0.82rem;color:#5A7A62;margin-bottom:14px;line-height:1.6;'>
+  <strong style='color:#1E5C32;'>May 2026 · Charlottesville, VA · 1 household · 4 stores</strong><br>
+  Tim, Abby, and Chas run the full flow every Sunday. Manual flyer entry. Real receipts.
+  The goal is eight weeks of undeniable Found Money data.
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:20px;'>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>✅ Done</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.8;'>
+    Core constraint engine — safety before savings<br>
+    Budget optimizer + meal planner<br>
+    Manual flyer entry — all 4 Cville stores<br>
+    Sunday Buy-Off screen<br>
+    Shopping list — mobile-first, interactive checkboxes<br>
+    Found Money Ledger + CSV export
+  </div>
+</div>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#F28B30;margin-bottom:8px;'>🔄 In Progress</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.8;'>
+    End-to-end flow without Tim in the room<br>
+    Pilot onboarding guide<br>
+    Receipt-to-engine accuracy tracking<br>
+    Constraint edge cases from real household use
+  </div>
+</div>
+</div>
+<div style='background:#F0FBF0;border-left:3px solid #5DAA6A;border-radius:0 8px 8px 0;
+            padding:12px 16px;margin-top:14px;font-size:0.84rem;color:#3A8C4E;
+            font-style:italic;line-height:1.55;'>
+  "I didn't realise how much we were spending at Kroger just because it was convenient.
+  Seeing the Found Money number on Sunday morning actually changed how I think about where we shop."
+  <div style='font-size:0.72rem;color:#5A7A62;margin-top:4px;font-style:normal;font-weight:600;'>
+    — Abby · Pilot Week 1
+  </div>
+</div>
+    """, unsafe_allow_html=True)
+
+with st.expander("Months 2–3 — First Wave · 5–10 Pilot Households", expanded=False):
+    st.markdown("""
+<div style='font-size:0.82rem;color:#5A7A62;margin-bottom:14px;line-height:1.6;'>
+  <strong style='color:#1E5C32;'>June – July 2026 · Friends and family recruited by Tim</strong><br>
+  What breaks at 1 household stays a quirk. What breaks at 5 becomes a pattern.
+  Each new household is a different constraint profile, a different store mix, a different budget.
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:20px;'>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Features driven by pilot feedback</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.8;'>
+    Multi-household account structure<br>
+    Allergy household mode — visible safety, not just rules<br>
+    Ingredient rejection transparency (Sincere Strategy)<br>
+    Store coverage beyond Charlottesville<br>
+    Guided onboarding — setup in under 10 minutes alone<br>
+    In-app meal feedback ("we hated the stir-fry")
+  </div>
+</div>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Infrastructure to support 5–10 households</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.8;'>
+    Simple data persistence — SQLite or hosted Postgres<br>
+    Basic authentication — email + password<br>
+    Weekly Found Money summary email (no marketing)<br>
+    Error monitoring — know when the engine fails
+  </div>
+</div>
+</div>
+    """, unsafe_allow_html=True)
+
+with st.expander("Months 4–5 — Beta Expansion · 20–30 Households", expanded=False):
+    st.markdown("""
+<div style='font-size:0.82rem;color:#5A7A62;margin-bottom:14px;line-height:1.6;'>
+  <strong style='color:#1E5C32;'>August – September 2026 · Broader Virginia / mid-Atlantic</strong><br>
+  Twenty households is not a lot of users. It is a lot of data.
+  By this point we know which features matter and which ones we thought would matter.
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:20px;'>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Application features</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.8;'>
+    PDF circular parsing — Kroger + Food Lion production-ready<br>
+    Meal ratings + preference memory — Week 8 better than Week 1<br>
+    Pantry awareness (basic) — "we already have olive oil"<br>
+    Health Guard tier — diabetes-aware, CKD-safe, MCAS avoidance
+  </div>
+</div>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Infrastructure</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.8;'>
+    PostgreSQL — production-grade persistence<br>
+    OAuth authentication (Google / Apple)<br>
+    Architecture transition plan — Streamlit → React + FastAPI<br>
+    First infrastructure engineer hire
+  </div>
+</div>
+</div>
+    """, unsafe_allow_html=True)
+
+with st.expander("Month 6–12 — Regional Scale · API Integrations · Post-Investment Build", expanded=False):
+    st.markdown("""
+<div style='font-size:0.82rem;color:#5A7A62;margin-bottom:14px;line-height:1.6;'>
+  <strong style='color:#1E5C32;'>October 2026 – April 2027 · Mid-Atlantic → Southeast</strong><br>
+  This is where manual entry ends. API integrations with major chains replace the clipboard.
+  The engine that Tim ran for eight weeks in Charlottesville now runs automatically
+  for hundreds of households across multiple markets — same logic, same Sincere Strategy,
+  no manual work required.
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;'>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Grocer API integrations</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.85;'>
+    <strong>Kroger</strong> — Developer API, live weekly sale data, loyalty pricing<br>
+    <strong>Publix</strong> — BOGO detection, weekly ad feed<br>
+    <strong>Safeway / Albertsons</strong> — Just4U rewards, digital circular<br>
+    <strong>Aldi</strong> — ALDI Finds + weekly specials<br>
+    <strong>Walmart Grocery</strong> — Rollback pricing, pickup integration<br>
+    <strong>Harris Teeter</strong> — VIC card pricing, digital coupons<br>
+    <strong>Giant / Stop &amp; Shop</strong> — Northeast expansion
+  </div>
+</div>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Architecture + team</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.85;'>
+    React + FastAPI rewrite — production-grade, not Streamlit<br>
+    Infrastructure engineer — cloud, database, API pipeline<br>
+    Front-end developer — mobile-first React, design system<br>
+    Back-end developer — FastAPI, engine optimisation<br>
+    Grocer partnerships lead — API agreements, data access<br>
+    Health systems BD — clinical licensing, HIPAA path<br>
+    PostgreSQL + Redis — real persistence, real performance
+  </div>
+</div>
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:20px;'>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>Marketing opportunities</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.85;'>
+    <strong>Zero paid placements</strong> — this is itself a marketing story<br>
+    Household word-of-mouth — Found Money travels<br>
+    Health system referrals — clinicians recommend to patients<br>
+    Grocer loyalty program co-marketing — the chains benefit too<br>
+    Food bank &amp; community org partnerships — mission-aligned distribution<br>
+    Regional press — "the app that fights inflation one grocery run at a time"
+  </div>
+</div>
+<div>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:8px;'>The data package for investors</div>
+  <div style='font-size:0.84rem;color:#1A2E1D;line-height:1.85;'>
+    Avg. Found Money per household per week<br>
+    Week-over-week retention across cohorts<br>
+    Engine accuracy vs. actual receipts<br>
+    Which household types benefit most<br>
+    CAC vs. LTV by acquisition channel<br>
+    Cost to serve per household per month
+  </div>
+</div>
+</div>
+    """, unsafe_allow_html=True)
+
+with st.expander("Months 12–18+ — National · Any Household, Any Store, Any Market", expanded=False):
+    st.markdown("""
+<div style='font-size:0.82rem;color:#5A7A62;margin-bottom:16px;line-height:1.6;'>
+  <strong style='color:#1E5C32;'>2027 and beyond · 50,000+ households · $2M+ ARR target</strong><br>
+  The product that worked in Charlottesville works identically in Austin, Portland, Chicago,
+  and Miami — because it's built on local store data, not a national average.
+  Every market has different chains, different sale cycles, different prices.
+  WhollyFare's engine handles all of it. That's the moat.
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;'>
+<div style='background:#E3F4E8;border-radius:10px;padding:16px;'>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:10px;'>Product at national scale</div>
+  <div style='font-size:0.82rem;color:#1A2E1D;line-height:1.8;'>
+    15+ grocer chain integrations<br>
+    Full recipe library with step-by-step instructions<br>
+    Pantry tracking — reduce food waste, not just cost<br>
+    Cuisine preference memory across weeks<br>
+    Meal type selection — weeknight, date night, batch cook<br>
+    Family meal history — "we loved this in March"
+  </div>
+</div>
+<div style='background:#E3F4E8;border-radius:10px;padding:16px;'>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:10px;'>Geographic expansion logic</div>
+  <div style='font-size:0.82rem;color:#1A2E1D;line-height:1.8;'>
+    Each new market requires: grocer API access or data agreement, constraint data
+    for regional health conditions, and at least one anchor pilot household to verify
+    local accuracy before broad launch.<br><br>
+    <strong>Charlottesville proved the model.<br>
+    The model travels. The data makes it local.</strong>
+  </div>
+</div>
+<div style='background:#E3F4E8;border-radius:10px;padding:16px;'>
+  <div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+              color:#3A8C4E;margin-bottom:10px;'>Revenue at scale</div>
+  <div style='font-size:0.82rem;color:#1A2E1D;line-height:1.8;'>
+    50,000 households × $19/mo Health Guard = $950k MRR<br>
+    Health system licensing — $50k–$500k annual contracts<br>
+    No ads. No affiliate deals. No data sales.<br>
+    Subscription revenue only — aligned with the household, always.<br><br>
+    <strong>The Sincere Strategy is the business model.</strong>
+  </div>
+</div>
+</div>
+    """, unsafe_allow_html=True)
+
+st.divider()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 15. THE CLOSE — open door, not a round
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <div class="inv-ask-hero">
