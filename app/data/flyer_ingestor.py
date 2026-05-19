@@ -107,4 +107,4 @@ class FlyerIngestor:
                 stub = self._stub_candidate(name)
                 stub.sale_price_per_unit = price
                 candidates.append(stub)
-        return candida
+        return candidates
