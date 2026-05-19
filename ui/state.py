@@ -38,7 +38,20 @@ except ModuleNotFoundError as _e:
         f"Streamlit Cloud has redeployed."
     )
 except Exception as _e:
-    _DB_IMPORT_ERROR = f"DB client import failed: {_e}"
+    # Enhanced diagnostics: find where Python is finding 'supabase'
+    import sys as _sys
+    _sb_location = "not found on sys.path"
+    try:
+        import supabase as _sb_mod
+        _sb_location = str(getattr(_sb_mod, '__file__', None) or getattr(_sb_mod, '__path__', 'no __file__ or __path__'))
+    except Exception:
+        pass
+    _DB_IMPORT_ERROR = (
+        f"DB client import failed: {_e} | "
+        f"supabase found at: {_sb_location} | "
+        f"Python: {_sys.version[:6]} | "
+        f"sys.path[0:2]: {_sys.path[:2]}"
+    )
 
 # Profile schema import for conversion helpers (optional — pages may use HouseholdProfile directly)
 try:
