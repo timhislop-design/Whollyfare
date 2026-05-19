@@ -229,4 +229,6 @@ else:
         st.rerun()
 
     st.caption(
-     
+             "Once you're happy with the five dinners above, tap to lock in the week. "
+        "Your shopping list will be ready immediately."
+    )
