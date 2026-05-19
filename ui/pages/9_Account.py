@@ -33,6 +33,76 @@ st.set_page_config(
 )
 state.init()
 
+
+def _show_db_diagnosis():
+    """Show a step-by-step diagnosis when the DB connection fails."""
+    status = state.db_status()
+
+    st.error("Can't reach the database. Here's what's failing:")
+
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        icon = "✅" if status["package_ok"] else "❌"
+        st.markdown(
+            f"<div style='text-align:center;padding:12px;background:#{'E3F4E8' if status['package_ok'] else 'FFEBEE'};"
+            f"border-radius:8px;'>"
+            f"<div style='font-size:1.5rem;'>{icon}</div>"
+            f"<div style='font-size:0.8rem;font-weight:700;color:#1A2E1D;margin-top:4px;'>supabase package</div>"
+            f"<div style='font-size:0.72rem;color:#5A7A62;'>installed in environment</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    with col_b:
+        icon = "✅" if status["secrets_ok"] else "❌"
+        st.markdown(
+            f"<div style='text-align:center;padding:12px;background:#{'E3F4E8' if status['secrets_ok'] else 'FFEBEE'};"
+            f"border-radius:8px;'>"
+            f"<div style='font-size:1.5rem;'>{icon}</div>"
+            f"<div style='font-size:0.8rem;font-weight:700;color:#1A2E1D;margin-top:4px;'>secrets configured</div>"
+            f"<div style='font-size:0.72rem;color:#5A7A62;'>Streamlit Cloud settings</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    with col_c:
+        icon = "✅" if status["connect_ok"] else "❌"
+        st.markdown(
+            f"<div style='text-align:center;padding:12px;background:#{'E3F4E8' if status['connect_ok'] else 'FFEBEE'};"
+            f"border-radius:8px;'>"
+            f"<div style='font-size:1.5rem;'>{icon}</div>"
+            f"<div style='font-size:0.8rem;font-weight:700;color:#1A2E1D;margin-top:4px;'>DB reachable</div>"
+            f"<div style='font-size:0.72rem;color:#5A7A62;'>Supabase query succeeded</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+    if status["error"]:
+        st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+
+        # First failed step tells us exactly what to fix
+        if not status["package_ok"]:
+            st.warning(
+                "**Fix:** The `supabase` Python package isn't installed.  \n\n"
+                "1. Make sure `requirements.txt` has `supabase>=2.0.0` ✓ (it does)  \n"
+                "2. Push / commit to GitHub  \n"
+                "3. In Streamlit Cloud, click **Reboot app** to force a fresh install  \n\n"
+                f"_Raw error: {status['error']}_",
+                icon="🔧",
+            )
+        elif not status["secrets_ok"]:
+            st.warning(
+                "**Fix:** Supabase credentials aren't in Streamlit Cloud's secrets.  \n\n"
+                "1. Go to your app on [share.streamlit.io](https://share.streamlit.io)  \n"
+                "2. Click **⋮ → Settings → Secrets**  \n"
+                "3. Paste this exactly:\n\n"
+                "```toml\n"
+                "[supabase]\n"
+                "url = \"https://liviclgyapbeoefxbunh.supabase.co\"\n"
+                "anon_key = \"sb_publishable_suP4Ty6mULuNTKyilIfEHw_QsBVjwCf\"\n"
+                "```\n\n"
+                "4. Click **Save** — the app will reboot automatically.",
+                icon="🔑",
+            )
+
 with st.sidebar:
     style.sidebar_nav()
 
@@ -331,15 +401,16 @@ with card_col:
                 with st.spinner("Creating your account…"):
                     ok, msg = state.sign_up(new_email.strip(), new_pw)
                 if ok:
-                    # sign_up also signs the user in on success
                     st.success("✅ Account created! Setting you up…")
                     st.balloons()
-                    # Short pause so user sees the success state, then forward
                     import time; time.sleep(1.2)
                     st.switch_page("pages/1_Household.py")
                 else:
                     if "already registered" in msg.lower() or "already exists" in msg.lower():
                         st.error("That email is already registered. Use the Sign In tab.")
+                    elif "not available" in msg.lower() or "not installed" in msg.lower() or "secrets" in msg.lower():
+                        # DB/config problem — show diagnostic
+                        _show_db_diagnosis()
                     else:
                         st.error(f"Couldn't create account: {msg}")
 
@@ -388,14 +459,12 @@ with card_col:
                 if ok:
                     st.success("✅ Signed in! Loading your household…")
                     import time; time.sleep(0.8)
-                    # If household exists go to plan flow, otherwise to setup
-                    if st.session_state.get("household") or st.session_state.get("household_db"):
-                        st.switch_page("pages/1_Household.py")
-                    else:
-                        st.switch_page("pages/1_Household.py")
+                    st.switch_page("pages/1_Household.py")
                 else:
                     if "invalid" in msg.lower() or "credentials" in msg.lower():
                         st.error("Email or password not recognised. Check your details and try again.")
+                    elif "not available" in msg.lower() or "not installed" in msg.lower() or "secrets" in msg.lower():
+                        _show_db_diagnosis()
                     else:
                         st.error(f"Sign in failed: {msg}")
 

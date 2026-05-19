@@ -24,12 +24,21 @@ household_id    : str | None    — UUID of the household row in DB
 import streamlit as st
 from datetime import date, timedelta
 
-# DB layer import — safe to import even if DB is unreachable; functions degrade gracefully
+# DB layer import — captures the real error so it can be shown to the user
+_DB_AVAILABLE = False
+_DB_IMPORT_ERROR: str | None = None
+
 try:
     from app.db.client import get_client
     _DB_AVAILABLE = True
-except Exception:
-    _DB_AVAILABLE = False
+except ModuleNotFoundError as _e:
+    _DB_IMPORT_ERROR = (
+        f"The 'supabase' package is not installed in this environment. "
+        f"({_e})  Make sure requirements.txt is committed to GitHub and "
+        f"Streamlit Cloud has redeployed."
+    )
+except Exception as _e:
+    _DB_IMPORT_ERROR = f"DB client import failed: {_e}"
 
 # Profile schema import for conversion helpers (optional — pages may use HouseholdProfile directly)
 try:
@@ -195,6 +204,54 @@ def approve_week():
 # PROD: Add OAuth providers (Google, Apple), magic links, session refresh
 #       tokens stored server-side, and a proper logout/timeout flow.
 
+def db_status() -> dict:
+    """
+    Return a dict describing the current DB connection status.
+    Used on the Account page to show a human-readable diagnosis when things fail.
+
+    Returns:
+        {
+          "package_ok": bool,    # supabase package importable
+          "secrets_ok": bool,    # secrets.toml / Streamlit Cloud secrets present
+          "connect_ok": bool,    # actually reached Supabase
+          "error": str | None,   # first error found, or None
+        }
+    """
+    result = {"package_ok": _DB_AVAILABLE, "secrets_ok": False,
+               "connect_ok": False, "error": _DB_IMPORT_ERROR}
+
+    if not _DB_AVAILABLE:
+        return result
+
+    # Check secrets
+    try:
+        import streamlit as _st
+        _ = _st.secrets["supabase"]["url"]
+        _ = _st.secrets["supabase"]["anon_key"]
+        result["secrets_ok"] = True
+    except Exception as e:
+        result["error"] = (
+            f"Supabase secrets not found. On Streamlit Cloud, go to your app's "
+            f"Settings → Secrets and add:\n\n"
+            f"[supabase]\n"
+            f"url = \"https://liviclgyapbeoefxbunh.supabase.co\"\n"
+            f"anon_key = \"sb_publishable_suP4Ty6mULuNTKyilIfEHw_QsBVjwCf\"\n\n"
+            f"(Raw error: {e})"
+        )
+        return result
+
+    # Try connecting
+    try:
+        from app.db.client import test_connection
+        result["connect_ok"] = test_connection()
+        if not result["connect_ok"]:
+            result["error"] = "Supabase is reachable but the test query failed. Check the feature_flags table exists."
+    except Exception as e:
+        result["error"] = f"Connection failed: {e}"
+
+    return result
+
+
 def sign_up(email: str, password: str) -> tuple[bool, str]:
     """
     Create a new Supabase auth account.
@@ -203,7 +260,7 @@ def sign_up(email: str, password: str) -> tuple[bool, str]:
     On success, also signs the user in and populates st.session_state["user"].
     """
     if not _DB_AVAILABLE:
-        return False, "Database not available."
+        return False, _DB_IMPORT_ERROR or "Database client not available."
     try:
         db = get_client()
         resp = db.auth.sign_up({"email": email, "password": password})
@@ -225,7 +282,7 @@ def sign_in(email: str, password: str) -> tuple[bool, str]:
     On success, populates st.session_state["user"] and loads household from DB.
     """
     if not _DB_AVAILABLE:
-        return False, "Database not available."
+        return False, _DB_IMPORT_ERROR or "Database client not available."
     try:
         db = get_client()
         resp = db.auth.sign_in_with_password({"email": email, "password": password})
