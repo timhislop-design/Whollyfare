@@ -252,7 +252,7 @@ def stores_near_zip(
             cost = None
         else:
             dist = haversine_miles(centroid[0], centroid[1], loc["lat"], loc["lon"])
-            if dist > radius_miles:
+            if dist > radius_miles + 0.4:  # x.4 and under counts as within radius
                 continue
             cost = trip_cost_estimate(dist)
         results.append({**loc, "distance_miles": dist, "trip_cost": cost})

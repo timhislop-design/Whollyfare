@@ -292,10 +292,13 @@ home_zip      = st.session_state.get("home_zip", "")
 travel_radius = int(st.session_state.get("travel_radius_mi", 15))
 
 # nearby_chains: used by tier cards below to filter store lists by region.
-# Always defined here so tier cards don't NameError.
-# POC: zip-prefix region lookup. PROD: real store-locator API.
+# Always computed from confirmed store location data (not broad regional lookup)
+# so tier cards only show chains that actually exist near the user's zip.
+# POC: hardcoded store registry. PROD: real store-locator API.
+_confirmed_nearby = stores_near_zip(home_zip or "22903", float(travel_radius))
 nearby_chains = (
-    chains_for_zip(home_zip) if home_zip
+    {loc["chain"] for loc in _confirmed_nearby}
+    if home_zip
     else {s["chain"] for t in STORE_TIERS for s in t["stores"]}
 )
 
@@ -347,13 +350,49 @@ if _show_wizard:
         travel_radius = w_radius
 
     # ── Nearby stores ─────────────────────────────────────────────────────────
-    effective_zip = home_zip if home_zip else "22903"   # Charlottesville fallback for pilot
+    # POC: store registry covers Charlottesville / Palmyra VA only.
+    # PROD: Replace with Google Places API (Tim has prior experience with this)
+    #       to return real stores with lat/lon + address for any US zip.
+    effective_zip = home_zip if home_zip else "22903"
     nearby_stores = stores_near_zip(effective_zip, float(w_radius))
-    nearby_chains  = {loc["chain"] for loc in nearby_stores}  # update for tier cards below
+    nearby_chains = {loc["chain"] for loc in nearby_stores}
 
-    # ── Map ───────────────────────────────────────────────────────────────────
+    # Fallback: if zip is outside our location registry, use regional chain list
+    if not nearby_stores and home_zip:
+        from app.data.store_regions import chains_for_zip as _cfz
+        _regional = _cfz(home_zip)
+        for _t in STORE_TIERS:
+            for _s in _t["stores"]:
+                if _s["chain"] in _regional:
+                    nearby_stores.append({
+                        "chain":          _s["chain"],
+                        "location":       _s["chain"],
+                        "address":        "",
+                        "lat":            None,
+                        "lon":            None,
+                        "tier":           _t["key"],
+                        "distance_miles": None,
+                        "trip_cost":      None,
+                        "api_live":       "api" in _s.get("source", ""),
+                        "_fallback":      True,
+                    })
+        nearby_chains = {s["chain"] for s in nearby_stores}
+        st.html(
+            "<div style='background:#FFF8F0;border:1px solid #FFCC80;"
+            "border-radius:8px;padding:12px 16px;font-size:0.83rem;"
+            "color:#7A4A00;margin-bottom:12px;line-height:1.6;'>"
+            "<strong>&#128205; Pilot area notice:</strong> Confirmed store "
+            "locations and distances are available for Charlottesville / Palmyra VA. "
+            "For your zip we're showing chains available in your region — "
+            "<strong>enter your distance to each store manually</strong> and "
+            "WhollyFare will calculate trip costs from there. "
+            "Full location data via Google Places API is on the roadmap."
+            "</div>"
+        )
+
+    _has_real_locs = any(not s.get("_fallback") for s in nearby_stores)
     centroid = zip_centroid(effective_zip)
-    if centroid and FOLIUM_AVAILABLE and nearby_stores:
+    if centroid and FOLIUM_AVAILABLE and nearby_stores and _has_real_locs:
         tier_marker_colors = {
             "discount":   "orange",
             "mainstream": "green",
@@ -426,7 +465,7 @@ if _show_wizard:
     if not nearby_stores:
         st.html("<div style='font-size:0.84rem;color:#5A7A62;padding:10px 0;'>"
                 "Enter a zip code above to see stores near you.</div>")
-    else:
+    elif nearby_stores:
         # Track wizard selections in temp state
         if "wizard_selections" not in st.session_state:
             st.session_state["wizard_selections"] = {
@@ -578,6 +617,9 @@ if _show_wizard:
 # PROFILE CARD — compact view after wizard is complete
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 else:
+    # Keep nearby_chains in sync with confirmed locations (used by tier cards below)
+    nearby_stores = _confirmed_nearby
+    nearby_chains = {loc["chain"] for loc in nearby_stores}
     tier_colors_prof = {
         "discount": "#BF5E00", "mainstream": "#1E5C32",
         "specialty": "#1565C0", "local": "#5D4037",
