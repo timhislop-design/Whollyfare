@@ -360,4 +360,39 @@ if save_pressed:
 
         # ── Persist to DB ─────────────────────────────────────────────────────
         # POC: save_household() degrades gracefully if not authenticated or DB down.
-        # PROD: show a "not 
+        # PROD: show a "not         # POC: save_household() degrades gracefully if not authenticated or DB down.
+        # PROD: show a "not signed in" prompt and require auth before saving.
+        household_dict = {
+            "name":              hh_name.strip(),
+            "weekly_budget_usd": weekly_budget,
+            "servings_per_meal": int(servings),
+            "meals_per_week":    int(meals_per_week),
+            "zip_code":          st.session_state.get("home_zip", ""),
+            "city":              (st.session_state.get("household_db") or {}).get("city", ""),
+            "state":             (st.session_state.get("household_db") or {}).get("state", "VA"),
+            "members": [
+                {
+                    "name":       m["name"].strip(),
+                    "age":        m.get("age") or None,
+                    "allergies":  m.get("allergies", []),
+                    "diagnoses":  [d.value if hasattr(d, "value") else d for d in
+                                   [Diagnosis(x) for x in m.get("diagnoses", [])]],
+                    "lifestyle":  [t.value if hasattr(t, "value") else t for t in
+                                   [LifestyleTag(x) for x in m.get("lifestyle", [])]],
+                    "exclusions": [
+                        line.strip()
+                        for line in m.get("exclusions", "").splitlines()
+                        if line.strip()
+                    ],
+                }
+                for m in st.session_state["member_list"]
+                if m["name"].strip()
+            ],
+        }
+
+        db_ok, db_msg = state.save_household(household_dict)
+        if db_ok:
+            st.success("Household profile saved. Head to the Grocer Hub to set up your stores →")
+        else:
+            st.warning(f"Profile saved to this session. DB save failed: {db_msg}")
+        st.rerun()

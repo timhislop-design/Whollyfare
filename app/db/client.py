@@ -18,24 +18,21 @@ import streamlit as st
 from supabase import create_client, Client
 
 
-@st.cache_resource
 def get_client() -> Client:
     """
-    Returns a cached Supabase client for the duration of the session.
+    Returns a Supabase client scoped to the current Streamlit session.
 
-    st.cache_resource means this only initialises once per app instance —
-    not once per page load or user action. Safe and efficient for a POC.
-
-    POC:  Uses the anon key — safe for RLS-protected tables because
-          every table has row-level security policies that gate access
-          by auth.uid(). The anon key cannot read data it isn't allowed to.
-    PROD: Add a separate service-role client for admin operations
-          (aggregate queries, audit log reads, weekly metrics jobs).
-          Never expose the service-role key to the browser.
+    POC:  Stored in st.session_state so each browser tab gets its own client
+          with its own auth JWT. This prevents cross-session JWT bleed that
+          occurred when @st.cache_resource shared one client across all users.
+    PROD: Same pattern — per-session client is correct for user-facing auth.
+          Add a separate module-level service-role client for admin/batch ops.
     """
-    url: str = st.secrets["supabase"]["url"]
-    key: str = st.secrets["supabase"]["anon_key"]
-    return create_client(url, key)
+    if "_supabase_client" not in st.session_state:
+        url: str = st.secrets["supabase"]["url"]
+        key: str = st.secrets["supabase"]["anon_key"]
+        st.session_state["_supabase_client"] = create_client(url, key)
+    return st.session_state["_supabase_client"]
 
 
 def test_connection() -> bool:
