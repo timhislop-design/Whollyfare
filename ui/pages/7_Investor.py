@@ -368,7 +368,7 @@ sale prices → constraint-aware meal plan → shopping list → grocer checkout
 That gap is WhollyFare&#174;.
     """)
 with col_p2:
-    st.markdown("""
+    st.html("""
 <div class="inv-stat">
   <div class="stat-number">$5,703</div>
   <div class="stat-label">Average annual U.S. household grocery spend</div>
@@ -400,7 +400,7 @@ safe, constraint-compliant meal plan for your household — then hand you a shop
 """)
 col_s1, col_s2, col_s3 = st.columns(3)
 with col_s1:
-    st.markdown("""<div class="step-card step-card-1">
+    st.html("""<div class="step-card step-card-1">
   <div class="step-icon">🛒</div><div class="step-title">1. Harvest</div>
   <div class="step-body">Pull weekly sale prices from grocery APIs and PDF circulars.
   Every item tagged with category, allergens, and nutrition data via USDA FDC.</div>
@@ -442,7 +442,7 @@ sincere = [
 col_a, col_b = st.columns(2)
 for i, (title, desc) in enumerate(sincere):
     with (col_a if i % 2 == 0 else col_b):
-        st.markdown(f"""<div class="sincere-card">
+        st.html(f"""<div class="sincere-card">
   <div class="sc-title">{title}</div>
   <div class="sc-body">{desc}</div>
 </div>""")
@@ -507,7 +507,7 @@ rings = [
 ]
 for col, (rn, rt, tags, desc, css) in zip(ring_cols, rings):
     with col:
-        st.markdown(f"""<div class="{css}">
+        st.html(f"""<div class="{css}">
   <div class="halo-ring-label">{rn}</div>
   <div class="halo-ring-title">{rt}</div>
   <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-bottom:8px">{tags}</div>
@@ -532,7 +532,7 @@ for tier_name, tier_price, tier_desc, tier_features in [
     ("Complete", "$29 / mo", "Recipes, pantry tracking, family favorites memory, auto-reorder.",
      "Everything in Health · Recipe engine · Pantry tracker · Flavor memory · Auto-reorder"),
 ]:
-    st.markdown(f"""<div class="inv-tier-row">
+    st.html(f"""<div class="inv-tier-row">
   <div class="inv-tier-name">{tier_name}</div>
   <div class="inv-tier-price">{tier_price}</div>
   <div class="inv-tier-desc"><strong>{tier_desc}</strong><br>
@@ -554,7 +554,7 @@ for col, icon, title, body in [
     (col_w3, "🤖", "AI makes it tractable", "LLM-assisted PDF parsing, constraint reasoning, and recipe generation have crossed the threshold of production reliability. This is buildable by a small team right now."),
 ]:
     with col:
-        st.markdown(f"""<div class="why-card">
+        st.html(f"""<div class="why-card">
   <div class="why-icon">{icon}</div>
   <div class="why-title">{title}</div>
   <div class="why-body">{body}</div>
@@ -576,7 +576,7 @@ not a necessity. This matters for valuation, for terms, and for the relationship
 
 nd_col1, nd_col2, nd_col3, nd_col4 = st.columns(4)
 with nd_col1:
-    st.markdown("""<div class="grant-card">
+    st.html("""<div class="grant-card">
   <div class="gc-name">USDA SBIR / NIFA Grants</div>
   <div class="gc-amount">$100k – $750k</div>
   <div class="gc-body">USDA's Small Business Innovation Research program funds food tech with health, nutrition, and local agriculture angles. WhollyFare's constraint engine and local-grocer focus are strong fits.</div>
@@ -630,7 +630,7 @@ through the seed phase — that is non-negotiable and is explicitly designed int
 itype_cols = st.columns(3)
 
 with itype_cols[0]:
-    st.markdown("""<div class="itype-card itype-angel">
+    st.html("""<div class="itype-card itype-angel">
   <div class="itype-badge itype-badge-angel">Angel Partner</div>
   <div class="itype-title">Believe in the mission. Get positioned early.</div>
   <div class="itype-sub">Individual or family office investors who want a stake in a category-defining
@@ -737,7 +737,7 @@ if calc_type == "Angel Partner":
         eq_at_cap  = angel_invest / valuation_cap
         # After Series A dilution (~20% dilution in a $3M raise at $9M pre)
         eq_post_sa = eq_at_cap * 0.80
-        st.markdown(
+        st.html(
             f"""<div style='background:#F0F9F2;border:1px solid #A8D5B0;border-radius:10px;
                             padding:16px 22px;margin-bottom:12px;'>
               <div style='font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
@@ -835,7 +835,7 @@ else:  # Strategic Acquirer
         angel_payout  = acq_price * angel_pct
         households_est = int(arr_target / 280)  # ~$280 ARPU (mix of tiers)
 
-        st.markdown(
+        st.html(
             f"""<div style='background:#FFFFFF;border:1px solid #D8EDD0;border-radius:10px;
                             padding:18px 24px;margin-bottom:16px;'>
               <div style='font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
@@ -921,7 +921,7 @@ with ctrl_col1:
         ("Mature / pre-acquisition",      70, 30, "Tim: ~70% economic · still controls strategic decisions"),
     ]
     for scenario, tim_pct, inv_pct, note in scenarios:
-        st.markdown(
+        st.html(
             f"""<div class="ctrl-bar">
               <div class="ctrl-scenario">{scenario}</div>
               <div class="ctrl-bar-outer">
