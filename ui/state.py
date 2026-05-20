@@ -413,33 +413,68 @@ def sign_up(email: str, password: str) -> tuple[bool, str]:
 
 def sign_in(email: str, password: str) -> tuple[bool, str]:
     """
-    Sign in with email + password.
+    Sign in with email + password via direct Supabase Auth REST call.
 
-    Returns (success: bool, message: str).
-    On success, populates st.session_state["user"] and loads household from DB.
+    Bypasses supabase-py's GoTrue client entirely — the GoTrue internal session
+    storage is not reliably propagated across Streamlit reruns or st.switch_page()
+    calls. We store the access token ourselves in session_state and use it
+    explicitly in every authenticated request via _sb_headers().
+
+    POC:  Token stored in session_state only — lost on browser refresh.
+          User must sign in again on each new browser session.
+    PROD: Store refresh_token in a secure HttpOnly cookie and silently refresh
+          before the 1-hour access token expiry.
     """
     if not _DB_AVAILABLE:
         return False, _DB_IMPORT_ERROR or "Database client not available."
     try:
-        db = get_client()
-        resp = db.auth.sign_in_with_password({"email": email, "password": password})
-        if resp.user:
-            st.session_state["user"] = {"id": resp.user.id, "email": resp.user.email}
-            # Store both tokens so get_authed_client() can call set_session()
-            # which populates the GoTrue internal storage that postgrest reads.
-            if resp.session:
-                st.session_state["_sb_access_token"]  = resp.session.access_token
-                st.session_state["_sb_refresh_token"] = resp.session.refresh_token
-            _log.info("sign_in: success uid=%s access_token_stored=%s",
-                      resp.user.id, "_sb_access_token" in st.session_state)
-            # Attempt to load the household that belongs to this user
-            _load_household_from_db()
-            # Restore grocer selections so the Grocer Hub wizard is pre-filled
-            # without the user having to re-enter their stores on every sign-in.
-            _load_grocers_from_db()
-            return True, "Signed in."
-        _log.warning("sign_in: no user returned for %s", email)
-        return False, "Invalid email or password."
+        url  = st.secrets["supabase"]["url"]
+        anon = st.secrets["supabase"]["anon_key"]
+
+        # Direct POST to Supabase Auth REST — same as supabase-js internally uses.
+        # Returns access_token, refresh_token, and user object without any
+        # intermediate GoTrue Python session-management layer.
+        resp = _requests.post(
+            f"{url}/auth/v1/token?grant_type=password",
+            json={"email": email, "password": password},
+            headers={
+                "apikey":        anon,
+                "Content-Type":  "application/json",
+            },
+            timeout=10,
+        )
+
+        if resp.status_code == 400:
+            _log.warning("sign_in: bad credentials for %s", email)
+            return False, "Invalid email or password."
+        if not resp.ok:
+            _log.error("sign_in: auth endpoint error %s: %s", resp.status_code, resp.text)
+            return False, f"Sign-in failed ({resp.status_code})."
+
+        data = resp.json()
+        access_token  = data.get("access_token")
+        refresh_token = data.get("refresh_token", "")
+        user_obj      = data.get("user", {})
+        uid           = user_obj.get("id")
+        user_email    = user_obj.get("email")
+
+        if not access_token or not uid:
+            _log.error("sign_in: response missing token or uid: %s", data)
+            return False, "Sign-in response incomplete — please try again."
+
+        # Store everything we need for subsequent authenticated requests.
+        st.session_state["user"]               = {"id": uid, "email": user_email}
+        st.session_state["_sb_access_token"]   = access_token
+        st.session_state["_sb_refresh_token"]  = refresh_token
+        _log.info("sign_in: success uid=%s token_stored=True", uid)
+
+        # Attempt to load the household that belongs to this user
+        _load_household_from_db()
+        # Restore grocer selections so the Grocer Hub wizard is pre-filled
+        # without the user having to re-enter their stores on every sign-in.
+        _load_grocers_from_db()
+        return True, "Signed in."
+
     except Exception as e:
         _log.error("sign_in: exception for %s: %s", email, e)
         return False, str(e)
