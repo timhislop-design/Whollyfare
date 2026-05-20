@@ -117,6 +117,14 @@ st.html(
     "color:#3A8C4E;margin-bottom:10px;'>Your household</div>")
 
 col1, col2, col3 = st.columns(3)
+# Show any save result that survived the rerun
+if "_hh_save_msg" in st.session_state:
+    _msg_type, _msg_text = st.session_state.pop("_hh_save_msg")
+    if _msg_type == "success":
+        st.success(_msg_text)
+    else:
+        st.warning(_msg_text)
+
 with col1:
     hh_name = st.text_input(
         "Household name",
@@ -402,17 +410,16 @@ if save_pressed:
 
         db_ok, db_msg = state.save_household(household_dict)
         if db_ok and "session only" not in db_msg:
-            st.success("Household profile saved. Head to the Grocer Hub to set up your stores →")
+            st.session_state["_hh_save_msg"] = ("success", "Household profile saved. Head to the Grocer Hub to set up your stores →")
         elif "session only" in db_msg:
-            # Not authenticated or DB unavailable — surface clearly so we can debug
             _auth_status = "signed in" if state.is_authenticated() else "NOT signed in"
             _db_status = "available" if state._DB_AVAILABLE else "unavailable"
-            st.warning(
+            st.session_state["_hh_save_msg"] = ("warning",
                 f"Saved to session only — not written to database. "
                 f"Auth: {_auth_status} | DB: {_db_status} | "
                 f"household_id: {st.session_state.get('household_id')} | "
                 f"user: {st.session_state.get('user')}"
             )
         else:
-            st.warning(f"Profile saved to this session. DB error: {db_msg}")
+            st.session_state["_hh_save_msg"] = ("warning", f"DB error: {db_msg}")
         st.rerun()
