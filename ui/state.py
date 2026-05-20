@@ -710,8 +710,10 @@ def save_household(household_dict: dict) -> tuple[bool, str]:
         return True, "Saved."
 
     except Exception as e:
-        # Degrade gracefully — session_state still has the data
-        st.session_state["household"] = household_dict
+        # Degrade gracefully — session_state already has the HouseholdProfile
+        # set by the calling page before save_household() was called.
+        # Do NOT overwrite it with household_dict (a plain dict) — that
+        # breaks every page that calls household.household_name etc.
         return False, f"DB save failed: {e}. Data saved to session only."
 
 

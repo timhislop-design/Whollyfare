@@ -99,6 +99,16 @@ st.html("""
 """)
 
 household = st.session_state.get("household")
+# Guard: if a previous failed save left a plain dict in session_state,
+# convert it to a HouseholdProfile or clear it so the form renders safely.
+if isinstance(household, dict):
+    _converted = state.db_dict_to_profile(household)
+    if _converted:
+        st.session_state["household"] = _converted
+        household = _converted
+    else:
+        st.session_state["household"] = None
+        household = None
 
 
 # ── Household basics ──────────────────────────────────────────────────────────
