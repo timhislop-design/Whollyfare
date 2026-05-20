@@ -22,7 +22,14 @@ household_id    : str | None    — UUID of the household row in DB
 """
 
 import streamlit as st
+import logging
 from datetime import date, timedelta
+
+# Debug logging — appears in Streamlit Cloud 'Manage app' logs.
+# Remove or set to WARNING in production.
+_log = logging.getLogger("whollyfare")
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 # DB layer import — captures the real error so it can be shown to the user
 _DB_AVAILABLE = False
@@ -417,14 +424,17 @@ def sign_in(email: str, password: str) -> tuple[bool, str]:
         resp = db.auth.sign_in_with_password({"email": email, "password": password})
         if resp.user:
             st.session_state["user"] = {"id": resp.user.id, "email": resp.user.email}
+            _log.info("sign_in: success for %s uid=%s", email, resp.user.id)
             # Attempt to load the household that belongs to this user
             _load_household_from_db()
             # Restore grocer selections so the Grocer Hub wizard is pre-filled
             # without the user having to re-enter their stores on every sign-in.
             _load_grocers_from_db()
             return True, "Signed in."
+        _log.warning("sign_in: no user returned for %s", email)
         return False, "Invalid email or password."
     except Exception as e:
+        _log.error("sign_in: exception for %s: %s", email, e)
         return False, str(e)
 
 
@@ -464,10 +474,13 @@ def _load_household_from_db():
     Silently no-ops if the user has no household yet.
     """
     if not _DB_AVAILABLE or not is_authenticated():
+        _log.warning("_load_household_from_db: skipped — DB available=%s authenticated=%s",
+                     _DB_AVAILABLE, is_authenticated())
         return
 
     db = get_client()
     uid = current_user_id()
+    _log.info("_load_household_from_db: looking up household for uid=%s", uid)
 
     # Find the household this user belongs to
     rows = (
@@ -483,6 +496,7 @@ def _load_household_from_db():
 
     hid = rows[0]["household_id"]
     st.session_state["household_id"] = hid
+    _log.info("_load_household_from_db: found household_id=%s", hid)
 
     # Load household record
     hh_rows = (
@@ -605,6 +619,8 @@ def save_household(household_dict: dict) -> tuple[bool, str]:
     PROD: Diff members + constraints, apply only changes, write audit log entry.
     """
     if not _DB_AVAILABLE or not is_authenticated():
+        _log.warning("save_household: no DB write — DB available=%s authenticated=%s user=%s",
+                     _DB_AVAILABLE, is_authenticated(), st.session_state.get("user"))
         # Graceful degradation — keep working in session_state only
         st.session_state["household_db"] = household_dict
         return True, "Saved to session only (no DB connection)."
@@ -707,6 +723,7 @@ def save_household(household_dict: dict) -> tuple[bool, str]:
         # Update session_state to include the resolved IDs
         household_dict["id"] = hid
         st.session_state["household_db"] = household_dict
+        _log.info("save_household: saved household_id=%s for user=%s", hid, uid)
         return True, "Saved."
 
     except Exception as e:
@@ -714,6 +731,7 @@ def save_household(household_dict: dict) -> tuple[bool, str]:
         # set by the calling page before save_household() was called.
         # Do NOT overwrite it with household_dict (a plain dict) — that
         # breaks every page that calls household.household_name etc.
+        _log.error("save_household: DB exception for user=%s: %s", uid, e)
         return False, f"DB save failed: {e}. Data saved to session only."
 
 
