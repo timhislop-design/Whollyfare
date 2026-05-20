@@ -68,7 +68,7 @@ with st.sidebar:
 
 style.page_header(
     "Grocer Hub",
-    "Tell us where you shop. We'll track prices across every store and find your savings.",
+    "Set up your store profile — the stores you shop at, saved permanently so you never have to pick them again.",
 )
 
 # ── Progress stepper ──────────────────────────────────────────────────────────
@@ -355,12 +355,12 @@ if _show_wizard:
                 border:1px solid #D8EDD0;border-radius:14px;
                 padding:22px 26px 18px;margin-bottom:20px;'>
       <div style='font-size:1.15rem;font-weight:800;color:#1E5C32;margin-bottom:6px;'>
-        Set up your store profile
+        Your Store Profile
       </div>
       <div style='font-size:0.88rem;color:#3A8C4E;line-height:1.6;'>
-        Tell WhollyFare where you shop and how far you'll travel.
-        We'll show you every store within range — including ones you might not know about —
-        with honest trip cost estimates so you can decide if the savings are worth the drive.
+        Choose the stores you shop at and how far you'll travel.
+        This is saved to your profile — not something you redo each week.
+        Add or remove stores any time from here or the Household page.
       </div>
     </div>""")
 
@@ -616,7 +616,7 @@ if _show_wizard:
     with save_col:
         save_disabled = len(selected_chains) == 0
         save_clicked  = st.button(
-            "Save my stores",
+            "Save store profile",
             type="primary",
             disabled=save_disabled,
             use_container_width=True,
@@ -668,7 +668,7 @@ if _show_wizard:
         n = len(new_grocers)
         label = f"{n} store{'s' if n != 1 else ''}"
         if _db_ok:
-            st.success(f"Store profile saved — {label} added.")
+            st.success(f"Store profile saved — {label} added to your profile.")
         else:
             st.warning(f"Stores saved to this session ({label}). DB save failed: {_db_msg}")
         st.rerun()
@@ -934,7 +934,7 @@ if grocers:
     st.html("<hr style='border-color:#D8EDD0;margin:20px 0 14px 0;'>")
     st.html("<div style='font-size:0.68rem;font-weight:700;letter-spacing:0.1em;"
             "text-transform:uppercase;color:#3A8C4E;margin-bottom:10px;'>"
-            "YOUR ACTIVE STORES THIS WEEK</div>")
+            "YOUR SAVED STORES</div>")
 
     to_remove = None
     for idx, g in enumerate(grocers):
