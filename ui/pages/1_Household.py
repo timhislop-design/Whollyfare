@@ -315,15 +315,19 @@ st.divider()
 
 # ── Auth debug panel (remove after persistence is confirmed working) ──────────
 with st.expander("🔧 Debug: auth state", expanded=False):
-    import streamlit as _st
     _tok = st.session_state.get("_sb_access_token")
-    _usr = st.session_state.get("user")
+    try:
+        _svc = st.secrets["supabase"].get("service_role_key", "")
+    except Exception:
+        _svc = ""
     st.write({
-        "authenticated":      state.is_authenticated(),
-        "user_id":            state.current_user_id(),
-        "token_present":      bool(_tok),
-        "token_preview":      (_tok[:24] + "…") if _tok else "MISSING — will use anon key",
-        "session_state_keys": [k for k in st.session_state if not k.startswith("_FormData")],
+        "authenticated":        state.is_authenticated(),
+        "user_id":              state.current_user_id(),
+        "user_jwt_present":     bool(_tok),
+        "user_jwt_preview":     (_tok[:24] + "…") if _tok else "MISSING",
+        "service_role_present": bool(_svc),
+        "service_role_len":     len(_svc) if _svc else 0,
+        "session_state_keys":   [k for k in st.session_state if not k.startswith("_FormData")],
     })
 
 # ── Save ──────────────────────────────────────────────────────────────────────
