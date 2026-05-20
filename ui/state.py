@@ -522,26 +522,33 @@ def _sb_headers(write: bool = False) -> dict:
     anon   = st.secrets["supabase"]["anon_key"]
 
     if write:
-        # Service role key bypasses RLS — required for INSERT/UPDATE/DELETE
-        # because the user JWT + RLS path has proven unreliable in supabase-py
-        # across Streamlit reruns and st.switch_page() calls.
-        svc = st.secrets.get("supabase", {}).get("service_role_key") or ""
-        token = svc if svc else anon
+        # Service role key bypasses RLS — required for INSERT/UPDATE/DELETE.
+        # IMPORTANT: use try/except not .get() — Streamlit's SecretSection
+        # doesn't support chained .get() with dict defaults; it silently
+        # returns empty when the key exists but the accessor pattern is wrong.
+        try:
+            svc = st.secrets["supabase"]["service_role_key"] or ""
+        except (KeyError, AttributeError, TypeError):
+            svc = ""
         if not svc:
-            _log.warning("_sb_headers: service_role_key missing — write will fail RLS")
+            _log.warning("_sb_headers: service_role_key missing from secrets — INSERT will fail RLS")
+        # For service_role writes: use svc as BOTH apikey and Authorization.
+        # This is the standard Supabase pattern for server-side bypass.
+        api_key = svc if svc else anon
+        token   = svc if svc else anon
     else:
-        # Reads: use the user JWT so RLS filters to this user's rows only.
-        token = st.session_state.get("_sb_access_token") or anon
+        api_key = anon
+        token   = st.session_state.get("_sb_access_token") or anon
 
     h = {
-        "apikey":        anon,
+        "apikey":        api_key,
         "Authorization": f"Bearer {token}",
         "Content-Type":  "application/json",
         "Prefer":        "return=representation",
     }
     _log.debug("_sb_headers: mode=%s token_type=%s",
                "write" if write else "read",
-               "service_role" if (write and token != anon) else
+               "service_role" if (write and svc) else
                "user_jwt"     if (not write and token != anon) else "anon")
     return h
 
